@@ -22,7 +22,6 @@ def get_analyse(user_ip, date_from, date_to, payment_systems):
 
 def get_stage(user_ip, date_from, date_to, payment_systems, action):
     current_stage, max_stage, report_table_name = database.get_users_table(user_ip)
-    print(current_stage)
     database.drop_table(report_table_name)
     if action == 'previous':
         current_stage, max_stage = form_processor.make_report(date_from, date_to,
@@ -38,12 +37,18 @@ def get_stage(user_ip, date_from, date_to, payment_systems, action):
     next_disable = True if current_stage >= max_stage else False
     return rows, previous_disable, next_disable, current_stage, max_stage
 
+def get_excel(user_ip, date_from, date_to):
+    current_stage, max_stage, report_table_name = database.get_users_table(user_ip)
+    file_name = database.export_to_excel(report_table_name)
+    file_path = config.reports_dir
+    report_name = report_table_name + '_' + str(date_from).replace('-', '.') + '-' + str(date_to).replace('-', '.') + '.xlsx'
+    return send_from_directory(file_path + '/', file_name, as_attachment=True, attachment_filename=report_name)
 
 
 
 
 @app.route('/')
-def hello_world():
+def home():
     return render_template("Choco.html", hide_navigation=True)
 
 
@@ -73,6 +78,8 @@ def submit():
                                                                                        action)
             return render_template('Choco.html', rows=rows, previous_disable=previous_disable, next_disable=next_disable,
                                    hide_navigation=False, current_stage=current_stage, max_stage=max_stage)
+        if action == 'export':
+            return get_excel(user_ip, date_from, date_to)
 
 
 

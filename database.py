@@ -1,5 +1,6 @@
 import sqlite3
 import pandas
+import os
 
 import config
 
@@ -421,7 +422,8 @@ def export_to_excel(table_name):
     df3 = pandas.read_sql_query(query3, conn)
     # Saving dfs to different sheets
     file_name = table_name + '.xlsx'
-    writer = pandas.ExcelWriter(file_name, engine='xlsxwriter')
+    file_path = config.reports_dir + '/' + file_name
+    writer = pandas.ExcelWriter(file_path, engine='xlsxwriter')
     df1.to_excel(writer, sheet_name='Ошибка №1')
     df2.to_excel(writer, sheet_name='Ошибка №2')
     df3.to_excel(writer, sheet_name='Ошибка №3')
@@ -488,4 +490,8 @@ create_log_table()
 create_users_table()
 
 
+if not os.path.exists(config.attachment_dir):
+    os.makedirs(config.attachment_dir)
 
+if not os.path.exists(config.reports_dir):
+    os.makedirs(config.reports_dir)

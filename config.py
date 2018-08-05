@@ -16,6 +16,7 @@ status_payment = '1'
 status_refund = '2'
 
 attachment_dir = 'Attachments'
+reports_dir = 'Reports'
 
 
 # payment systems' emails and keys

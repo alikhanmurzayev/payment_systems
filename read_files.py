@@ -1,13 +1,9 @@
 import pandas
 import datetime
-import os
 
 import config
 import database
 
-# create att dir
-if not os.path.exists(config.attachment_dir):
-    os.makedirs(config.attachment_dir)
 
 
 def get_key_1(date, common_key, payment_amount, status):
