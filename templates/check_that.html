@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <title>TABLE</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/typedate.css')}}">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 </head>
 
 <body>
 <div class="container">
-    <form action="{{ url_for('submit') }}" method="post">
+    <form action="{{ url_for('submit') }}" method="post" class="was-validated">
+        <div align="center">
         <div class="parent">
-            <div class = "date_start">
+            <div>
                 <input type="date" id="start" name="date_from" required
                        value="{{request.form.date_from}}"
                        min="2000-01-01" max="2018-12-31" />
             </div>
 
-            <div class = "date_end">
+            <div>
                 <input type="date" id="start" name="date_to" required
                        value="{{request.form.date_to}}"
                        min="2000-01-01" max="2018-12-31" />
@@ -26,8 +27,8 @@
 
             <div class="multiselect">
                 <div class="selectBox" onclick="showCheckboxes()">
-                    <select>
-                        <option>Choose payment system</option>
+                    <select style="height: 26px">
+                        <option>Select payment system</option>
                     </select>
                     <div class="overSelect"></div>
                 </div>
@@ -39,24 +40,32 @@
                 </div>
             </div>
 
-            <div>
-                <button class="btn-save btn btn-primary btn-sm"  name="action" value="analyse" type="submit" >
-                    Analyse
-                </button>
-            </div>
-        </div>
 
+            <div><button class="button button2"  name="action" value="analyse" type="submit" >Analyse</button></div>
+        </div>
+    </div>
 <div align="center" style="{{ 'display:none' if hide_navigation else '' }}">
         <p>
             stage: {{current_stage}} of  {{max_stage}}
         </p>
-
         <button class="btn-save btn btn-primary btn-sm" name="action" value="previous" type="submit" {{ 'disabled' if previous_disable else '' }} >previous</button>
         <button class="btn-save btn btn-primary btn-sm" name="action" value="next" type="submit" {{ 'disabled' if next_disable else '' }} >next</button>
-        <br><br>
+        <br><br><br>
         <button class="btn-save btn btn-primary btn-sm" name="action" value="export" type="submit" >Export to Excel</button>
+        <br>
 </div>
     </form>
+<div align="center" style="margin-top: 10px">
+    <button class="toggle-vis" data-column="0" href="#">Date</button>
+    <button class="toggle-vis" data-column="1" href="#">Date Created</button>
+    <button class="toggle-vis" data-column="2" href="#">Order ID</button>
+    <button class="toggle-vis" data-column="3" href="#">Payment Amount</button>
+    <button class="toggle-vis" data-column="4" href="#">Payment Type</button>
+    <button class="toggle-vis" data-column="5" href="#">Payment Reference</button>
+    <button class="toggle-vis" data-column="6" href="#">Status</button>
+    <button class="toggle-vis" data-column="7" href="#">Error Type</button>
+    <button class="toggle-vis" data-column="8" href="#">Differece</button>
+</div>
 
     <div class="container-fluid">
         <div class="col-md-auto">
@@ -65,7 +74,7 @@
                 <tr>
                     <th data-column-id="date">Date</th>
                     <th data-column-id="date_created">Date Created</th>
-                    <th data-column-id="order_id">Order Id</th>
+                    <th data-column-id="order_id">Order ID</th>
                     <th data-column-id="payment_amount">Payment Amount</th>
                     <th data-column-id="payment_type">Payment Type</th>
                     <th data-column-id="payment_reference">Payment Reference</th>
@@ -106,8 +115,10 @@
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script type="text/javascript">
     $(document).ready(function() {
     // Setup - add a text input to each footer cell
@@ -118,6 +129,14 @@
 
     // DataTable
     var table = $('#example').DataTable();
+
+    $('button.toggle-vis').on('click', function (event) {
+        event.preventDefault();
+       
+        var column = table.column( $(this).attr('data-column') );
+
+        column.visible( ! column.visible() );
+    });
 
     // Apply the search
     table.columns().every( function () {

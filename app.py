@@ -41,7 +41,7 @@ def get_excel(user_ip, date_from, date_to):
     current_stage, max_stage, report_table_name = database.get_users_table(user_ip)
     file_name = database.export_to_excel(report_table_name)
     file_path = config.reports_dir
-    report_name = report_table_name + '_' + str(date_from).replace('-', '.') + '-' + str(date_to).replace('-', '.') + '.xlsx'
+    report_name = current_stage + '_' + report_table_name + '_' + str(date_from).replace('-', '.') + '-' + str(date_to).replace('-', '.') + '.xlsx'
     return send_from_directory(file_path + '/', file_name, as_attachment=True, attachment_filename=report_name)
 
 
@@ -49,7 +49,7 @@ def get_excel(user_ip, date_from, date_to):
 
 @app.route('/')
 def home():
-    return render_template("Choco.html", hide_navigation=True)
+    return render_template("check_that.html", hide_navigation=True)
 
 
 @app.route('/submit', methods=['GET', 'POST'])
@@ -70,13 +70,13 @@ def submit():
         action = request.form.get('action')
         if action == 'analyse':
             rows, previous_disable, next_disable, max_stage = get_analyse(user_ip, date_from, date_to, payment_systems)
-            return render_template('Choco.html', rows=rows, previous_disable=previous_disable, next_disable=next_disable,
+            return render_template('check_that.html', rows=rows, previous_disable=previous_disable, next_disable=next_disable,
                                    hide_navigation=False, current_stage=max_stage, max_stage=max_stage)
         if action == 'previous' or action == 'next':
             rows, previous_disable, next_disable, current_stage, max_stage = get_stage(user_ip, date_from,
                                                                                        date_to, payment_systems,
                                                                                        action)
-            return render_template('Choco.html', rows=rows, previous_disable=previous_disable, next_disable=next_disable,
+            return render_template('check_that.html', rows=rows, previous_disable=previous_disable, next_disable=next_disable,
                                    hide_navigation=False, current_stage=current_stage, max_stage=max_stage)
         if action == 'export':
             return get_excel(user_ip, date_from, date_to)
