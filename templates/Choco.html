@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TABLE</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/typedate.css')}}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+</head>
+
+<body>
+<div class="container">
+    <form action="{{ url_for('submit') }}" method="post">
+        <div class="parent">
+            <div class = "date_start">
+                <input type="date" id="start" name="date_from" required
+                       value="{{request.form.date_from}}"
+                       min="2000-01-01" max="2018-12-31" />
+            </div>
+
+            <div class = "date_end">
+                <input type="date" id="start" name="date_to" required
+                       value="{{request.form.date_to}}"
+                       min="2000-01-01" max="2018-12-31" />
+            </div>
+
+            <div class="multiselect">
+                <div class="selectBox" onclick="showCheckboxes()">
+                    <select>
+                        <option>Select an option</option>
+                    </select>
+                    <div class="overSelect"></div>
+                </div>
+                <div id="checkboxes" style="background-color: white">
+                    <label for="kaspi">
+                        <input type="checkbox" id="kaspi" name="kaspi" {{ 'checked' if request.form.get('kaspi') else '' }}/>Kaspi</label>
+                    <label for="processing">
+                        <input type="checkbox" id="processing" name="processing" {{ 'checked' if request.form.get('processing') else '' }}/>Processing</label>
+                </div>
+            </div>
+
+
+            {{ stages_text }}
+
+            <div>
+                <button class="btn-save btn btn-primary btn-sm"  name="action" value="analyse" type="submit" >
+                    Analyse
+                </button>
+            </div>
+        </div>
+
+<div align="center" style="{{ 'display:none' if hide_navigation else '' }}">
+        <p>
+            stage: {{current_stage}} of  {{max_stage}}
+        </p>
+
+        <button class="btn-save btn btn-primary btn-sm" name="action" value="previous" type="submit" {{ 'disabled' if previous_disable else '' }} >previous</button>
+        <button class="btn-save btn btn-primary btn-sm" name="action" value="next" type="submit" {{ 'disabled' if next_disable else '' }} >next</button>
+</div>
+    </form>
+
+    <div class="container-fluid">
+        <div class="col-md-auto">
+            <table id="example" class="table table-compact table-bordered table-hover" style="width:100%" cellpadding="0">
+                <thead>
+                <tr>
+                    <th data-column-id="date">Date</th>
+                    <th data-column-id="date_created">Date Created</th>
+                    <th data-column-id="order_id">Order Id</th>
+                    <th data-column-id="payment_amount">Payment Amount</th>
+                    <th data-column-id="payment_type">Payment Type</th>
+                    <th data-column-id="payment_reference">Payment Reference</th>
+                    <th data-column-id="status">Status</th>
+                    <th data-column-id="error_type">Error Type</th>
+                    <th data-column-id="difference">Difference</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{row['date']}}</td>
+                        <td>{{row['date_created']}}</td>
+                        <td>{{row['order_id']}}</td>
+                        <td>{{row['payment_amount']}}</td>
+                        <td>{{row['payment_type']}}</td>
+                        <td class="nowrap">{{row['payment_reference']}}</td>
+                        <td>{{row['status']}}</td>
+                        <td>{{row['error_type']}}</td>
+                        <td>{{row['difference']}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>date</th>
+                    <th>date_created</th>
+                    <th>order_id</th>
+                    <th>payment_amount</th>
+                    <th>payment_type</th>
+                    <th>payment_reference</th>
+                    <th>status</th>
+                    <th>error_type</th>
+                    <th>difference</th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+    // Setup - add a text input to each footer cell
+    $('#example tfoot th').each( function () {
+        var title = $(this).text();
+        $(this).html( '<input type="text" placeholder="'+title+'" />' );
+    } );
+
+    // DataTable
+    var table = $('#example').DataTable();
+
+    // Apply the search
+    table.columns().every( function () {
+
+        var that = this;
+        $( 'input', this.footer() ).on( 'keyup change', function () {
+            if ( that.search() !== this.value ) {
+                that
+                    .search( this.value )
+                    .draw();
+            }
+        } );
+    } );
+} );
+</script>
+<script type="text/javascript">
+    var expanded = false;
+
+    function showCheckboxes() {
+        var checkboxes = document.getElementById("checkboxes");
+        if (!expanded) {
+            checkboxes.style.display = "block";
+            expanded = true;
+        } else {
+            checkboxes.style.display = "none";
+            expanded = false;
+  }
+}
+</script>
+</body>
+</html>

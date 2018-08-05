@@ -1,0 +1,89 @@
+.parent {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 50px;
+    align-content: center;
+    margin-top: 10px;
+
+}
+
+legend {
+    background-color: #000;
+    color: #fff;
+    padding: 3px 6px;
+}
+
+.output {
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+input {
+    margin: 2px;
+}
+
+label {
+    background-size: cover;
+
+}
+
+.multiselect {
+  width: 200px;
+    z-index: 999999;
+}
+
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 100%;
+  font-weight: bold;
+}
+
+.overSelect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#checkboxes {
+  display: none;
+  border: 1px #dadada solid;
+}
+
+#checkboxes label {
+  display: block;
+}
+
+#checkboxes label:hover {
+  background-color: #1e90ff;
+}
+
+tfoot input{
+    display: table-header-group;
+    width: 100%;
+    padding: 3px;
+    box-sizing: border-box;
+    }
+
+th.date{
+    width: 15%;
+}
+
+html,
+body{
+    height: 100%;
+}
+
+.table{
+    width: auto;
+    table-layout: fixed;
+}
+
+.nowrap{
+    white-space: nowrap;
+    overflow: hidden;
+}
