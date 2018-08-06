@@ -45,7 +45,6 @@ def get_excel(user_ip, date_from, date_to):
 
 
 
-
 @app.route('/')
 def home():
     return render_template("check_that.html", hide_navigation=True)
@@ -79,8 +78,6 @@ def submit():
                                    hide_navigation=False, current_stage=current_stage, max_stage=max_stage)
         if action == 'export':
             return get_excel(user_ip, date_from, date_to)
-
-
 
 
 if __name__ == '__main__':

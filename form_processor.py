@@ -26,8 +26,8 @@ def get_report_table_name(user_ip):
     user_ip = str(user_ip).replace('.', '_')
     table_name = 'report' + '_' + user_ip
     return table_name
-def get_history_table_name(key_name, key):
-    table_name = key_name + '_' + str(key)
+def get_history_table_name(key, value):
+    table_name = key + '_' + str(value)
     return table_name
 
 def combine_errors(first_error_table, second_error_table, third_error_table):
@@ -174,8 +174,8 @@ def make_report(date_from, date_to, report_table_name, payment_systems,latest=Tr
     database.update_report_table(report_table_name, report_table)
     return stage, len(log_list[0])
 
-def get_history(order_id):
-    order_id = str(order_id)
+def make_history_table(key, value):
+    value = str(value)
     dates = database.get_daily_tables()
     daily_tables = list()
     for date in dates:
@@ -185,9 +185,22 @@ def get_history(order_id):
     daily_tables.sort()
     full_list = list()
     for table in daily_tables:
-        transactions = database.get_trans_by_order_id(table, order_id)
+        transactions = database.get_trans_by_key_value(table, key, value)
         full_list.append(transactions)
-    print(full_list)
     full_list = list(itertools.chain.from_iterable(full_list))
-    return full_list
+    # writing to table
+    history_table_name = get_history_table_name(key, value)
+    database.drop_table(history_table_name)
+    database.create_report_table(history_table_name)
+    database.update_report_table(history_table_name, full_list)
+    return history_table_name
+
+key = 'order_id'
+value = '33'
+
+table_name = make_history_table(key, value)
+
+print(table_name)
+
+
 

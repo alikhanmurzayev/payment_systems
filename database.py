@@ -339,9 +339,9 @@ def get_daily_analysis_table(table_name, payment_systems,latest=True, queue=1):
     return total
 
 
-def get_trans_by_order_id(table_name, order_id):
+def get_trans_by_key_value(table_name, key, value):
     conn, cursor = open_connection(config.database_name)
-    query = f"SELECT * FROM {table_name} WHERE order_id='{order_id}'"
+    query = f"SELECT * FROM {table_name} WHERE {str(key)}='{value}'"
     result = cursor.execute(query).fetchall()
     return result
 
@@ -516,6 +516,8 @@ create_payment_trans_table()
 create_log_table()
 create_users_table()
 create_daily_tables_table()
+
+
 
 
 if not os.path.exists(config.attachment_dir):
