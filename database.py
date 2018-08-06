@@ -339,6 +339,11 @@ def get_daily_analysis_table(table_name, payment_systems,latest=True, queue=1):
     return total
 
 
+def get_trans_by_order_id(table_name, order_id):
+    conn, cursor = open_connection(config.database_name)
+    query = f"SELECT * FROM {table_name} WHERE order_id='{order_id}'"
+    result = cursor.execute(query).fetchall()
+    return result
 
 def create_report_table(table_name):
     conn, cursor = open_connection(config.database_name)
@@ -483,11 +488,34 @@ def get_users_table(user_ip):
     except:
         return 0, 0
 
+def create_daily_tables_table():
+    conn, cursor = open_connection(config.database_name)
+    try:
+        query = f"CREATE TABLE {config.daily_tables_table} " \
+                f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, date date)"
+        cursor.execute(query)
+    except:
+        pass
+    close_connection(conn, cursor)
+def update_daily_tables_table(date):
+    conn, cursor = open_connection(config.database_name)
+    check_existence = f"SELECT * FROM {config.daily_tables_table} WHERE date='{date}'"
+    result = cursor.execute(check_existence).fetchall()
+    if len(result) == 0:
+        query = f"INSERT INTO {config.daily_tables_table} (date) VALUES ('{date}')"
+        cursor.execute(query)
+    close_connection(conn, cursor)
+def get_daily_tables():
+    conn, cursor = open_connection(config.database_name)
+    query = f"SELECT date FROM {config.daily_tables_table}"
+    result = cursor.execute(query).fetchall()
+    return result
 
 create_messages_table()
 create_payment_trans_table()
 create_log_table()
 create_users_table()
+create_daily_tables_table()
 
 
 if not os.path.exists(config.attachment_dir):

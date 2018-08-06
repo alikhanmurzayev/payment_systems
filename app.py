@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 def get_analyse(user_ip, date_from, date_to, payment_systems):
     load_attachments.load()
-    report_table_name = 'report'
+    report_table_name = form_processor.get_report_table_name(user_ip)
     current_stage, max_stage = form_processor.make_report(date_from, date_to, report_table_name, payment_systems, latest=True)
     database.update_users_table(user_ip, max_stage, max_stage, report_table_name)
     rows = database.get_report_table_rows(report_table_name, payment_systems)

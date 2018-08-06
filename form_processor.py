@@ -1,6 +1,7 @@
 import datetime
 import pandas
 import json
+import itertools
 
 import database
 import read_json
@@ -21,6 +22,13 @@ def get_api_response(day):
     json_file_name = get_daily_table_name(day) + '.json'
     with open(json_file_name) as f:
         return json.load(f)
+def get_report_table_name(user_ip):
+    user_ip = str(user_ip).replace('.', '_')
+    table_name = 'report' + '_' + user_ip
+    return table_name
+def get_history_table_name(key_name, key):
+    table_name = key_name + '_' + str(key)
+    return table_name
 
 def combine_errors(first_error_table, second_error_table, third_error_table):
     first_error = database.get_full_table(first_error_table)
@@ -80,6 +88,7 @@ def make_daily_analysis(date_interval):
         errors = combine_errors(first_error_table, second_error_table, third_error_table)
         daily_table_name = get_daily_table_name(d)
         database.create_daily_analysis_table(daily_table_name)
+        database.update_daily_tables_table(d)
         database.update_daily_analysis_table(daily_table_name, errors)
         # магия оканчивается
         # clearing database from temporary tables
@@ -165,13 +174,20 @@ def make_report(date_from, date_to, report_table_name, payment_systems,latest=Tr
     database.update_report_table(report_table_name, report_table)
     return stage, len(log_list[0])
 
-
-#make_daily_analysis(date_interval)
-#make_log(date_interval)
-
-#table_name, current_stage, max_stage = make_report(date_interval, latest=True)
-
-#file_name = database.export_to_excel(table_name)
-#print('saved file:', file_name)
-
+def get_history(order_id):
+    order_id = str(order_id)
+    dates = database.get_daily_tables()
+    daily_tables = list()
+    for date in dates:
+        date = date[0]
+        table_name = get_daily_table_name(date)
+        daily_tables.append(table_name)
+    daily_tables.sort()
+    full_list = list()
+    for table in daily_tables:
+        transactions = database.get_trans_by_order_id(table, order_id)
+        full_list.append(transactions)
+    print(full_list)
+    full_list = list(itertools.chain.from_iterable(full_list))
+    return full_list
 

@@ -11,6 +11,7 @@ payment_trans_table = 'payment_trans'
 choco_table = 'choco'
 log_table = 'log'
 users_table = 'users'
+daily_tables_table = 'daily_tables'
 
 status_payment = '1'
 status_refund = '2'
