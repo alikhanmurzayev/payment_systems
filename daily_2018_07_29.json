@@ -2,10 +2,10 @@
 	{
 		"date_created" : "2018-07-29 00:00:21",
 		"order_id" : 1167903,
-		"payment_amount" : 58041.00000,
+		"payment_amount" : 58040.00000,
 		"payment_code" : "KASPI",
 		"payment_reference" : "1551182018410729235920851",
-		"status" : 2
+		"status" : 1
 	},
 	{
 		"date_created" : "2018-07-29 00:00:22",

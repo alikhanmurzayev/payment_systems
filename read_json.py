@@ -2,7 +2,6 @@ import json
 import pandas
 
 import config
-import read_files
 
 def get_key_1(date, common_key, payment_amount, status):
     key = list()

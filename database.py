@@ -293,7 +293,7 @@ def update_daily_analysis_table(table_name, data):
             flag = True
             queue = int(old_queue) + 1
     if flag:
-        print('writing queue:', queue)
+        print(table_name, "updating queue:", queue)
         for trans in data:
             id = trans[0]
             date = trans[1]
@@ -315,7 +315,7 @@ def update_daily_analysis_table(table_name, data):
                     f"'{error_type}', '{difference}', '{queue}')"
             cursor.execute(query)
     else:
-        print('already exists')
+        print(table_name, ": don't need to update")
     close_connection(conn, cursor)
 def get_latest_queue(table_name):
     conn, cursor = open_connection(config.database_name)
