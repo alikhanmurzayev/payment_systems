@@ -444,7 +444,7 @@ def get_mix_max_date():
     max_date = cursor.execute(max_query).fetchall()
     return min_date[0][0], max_date[0][0]
 
-def get_report_table_rows(table_name, payment_systems):
+def get_report_table_rows(table_name):
     conn = sqlite3.connect(config.database_name)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()

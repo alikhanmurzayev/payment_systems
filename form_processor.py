@@ -195,12 +195,6 @@ def make_history_table(key, value):
     database.update_report_table(history_table_name, full_list)
     return history_table_name
 
-key = 'order_id'
-value = '33'
-
-table_name = make_history_table(key, value)
-
-print(table_name)
 
 
 

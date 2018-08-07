@@ -1,151 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>TABLE</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/typedate.css')}}">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-</head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Сверка по платежам</title>
 
+        <!-- Vendors -->
+
+        <!-- Material Design Icons -->
+        <link href="{{ url_for('static', filename='vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css') }}" rel="stylesheet">
+
+        <!-- Select 2 -->
+        <link href="{{ url_for('static', filename='vendors/bower_components/select2/dist/css/select2.min.css') }}" rel="stylesheet">
+
+        <!-- Site CSS -->
+        <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+
+    </head>
 <body>
-<div class="container">
-    <form action="{{ url_for('submit') }}" method="post">
-        <div class="parent">
-            <div class = "date_start">
-                <input type="date" id="start" name="date_from" required
-                       value="{{request.form.date_from}}"
-                       min="2000-01-01" max="2018-12-31" />
-            </div>
 
-            <div class = "date_end">
-                <input type="date" id="start" name="date_to" required
-                       value="{{request.form.date_to}}"
-                       min="2000-01-01" max="2018-12-31" />
-            </div>
+<div class="tab">
+    <ul class="tab-nav tab-nav--justified">
+        <li class="{{'active' if analyse_active else ''}}">
+            <a href="#analyse" data-toggle="tab">
+                Analyse
+            </a>
+        </li>
+        <li class="{{'active' if history_active else ''}}">
+            <a href="#history" data-toggle="tab">
+                History
+            </a>
+        </li>
+    </ul>
 
-            <div class="multiselect">
-                <div class="selectBox" onclick="showCheckboxes()">
-                    <select>
-                        <option>Choose payment system</option>
-                    </select>
-                    <div class="overSelect"></div>
-                </div>
-                <div id="checkboxes" style="background-color: white">
-                    <label for="kaspi">
-                        <input type="checkbox" id="kaspi" name="kaspi" {{ 'checked' if request.form.get('kaspi') else '' }}/>Kaspi</label>
-                    <label for="processing">
-                        <input type="checkbox" id="processing" name="processing" {{ 'checked' if request.form.get('processing') else '' }}/>Processing</label>
-                </div>
-            </div>
-
-            <div>
-                <button class="btn-save btn btn-primary btn-sm"  name="action" value="analyse" type="submit" >
-                    Analyse
-                </button>
+    <div class="tab-content">
+        <div class="tab-pane card {{'active' if analyse_active else ''}}" id="analyse">
+            <div class="card__body">
+                <form  method="post" action="{{ url_for('submit') }}">
+                    <div class="form-group">
+                        <div class="input-group" style="margin-left: 15%; margin-top: 20px">
+                            <span class="input-group-addon">
+                                <i class="zmdi zmdi-calendar"></i>
+                            </span>
+                            <div class="form-group">
+                                <input
+                                        type='date' class="form-control"
+                                        name="date_from" required
+                                        value="{{request.form.date_from}}"
+                                        min="2000-01-01" max="2018-12-31"
+                                />
+                                <i class="form-group__bar"></i>
+                            </div>
+                            <span class="input-group-addon">
+                                <i class="zmdi zmdi-calendar"></i>
+                            </span>
+                            <div class="form-group">
+                                <input
+                                        type='date' class="form-control"
+                                        name="date_to" required
+                                        value="{{request.form.date_to}}"
+                                        min="2000-01-01" max="2018-12-31"
+                                />
+                                <i class="form-group__bar"></i>
+                            </div>
+                            <span class="input-group-addon">
+                                <i class="zmdi zmdi-card"></i>
+                            </span>
+                            <div>
+                                <select class="select2" multiple data-placeholder="Select Payment System" name="payment_systems">
+                                    <option value="kaspi" {{ 'selected' if 'kaspi' in request.form.getlist('payment_systems') else '' }}> Kaspi</option>
+                                    <option value="processing" {{ 'selected' if 'processing' in request.form.getlist('payment_systems') else '' }}>Processing</option>
+                                    <option value="rps" {{ 'selected' if 'rps' in request.form.getlist('payment_systems') else '' }}> RPS</option>
+                                    <option value="qazkom" {{ 'selected' if 'qazkom' in request.form.getlist('payment_systems') else '' }}> QAZKOM</option>
+                                    <option value="qiwi" {{ 'selected' if 'qiwi' in request.form.getlist('payment_systems') else '' }}> Qiwi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; margin-left: 45%">
+                            <button class="btn btn--light btn--icon-text" name="action" value="analyse" type="submit"><i class="zmdi zmdi-flip"></i>Analyse</button>
+                        </div>
+                        <div class="btn-group" style="margin-top: 15px; margin-left: 40%; {{'display:none' if hide_navigation else ''}}">
+                            <button class="btn btn--light btn--icon-text" name="action" value="back" type="submit" {{'disabled' if back_disable else ''}}><i class="zmdi zmdi-arrow-back"></i>Back</button>
+                            <button class="btn btn--light btn--icon-text" name="action" value="export" type="submit"><i class="zmdi zmdi-archive"></i>Export</button>
+                            <button class="btn btn--light btn--icon-text" name="action" value="forward" type="submit" {{'disabled' if forward_disable else ''}}>Forward <i class="zmdi zmdi-arrow-forward"></i></button>
+                            <br><br><br>
+                            <p style="margin-left: 30%">
+                                Stage: {{current_stage}} of  {{max_stage}}
+                            </p>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+        <div class="tab-pane {{'active' if history_active else ''}}" id="history">
+            <div class="card">
+                <div class="card__body">
+                    <form method="post" class="row" action="{{ url_for('submit') }}">
+                        <div class="input-group">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="key" value="order_id" required>
+                                    <i class="input-helper"></i>
+                                    Order ID
+                                </label>
+                            </div>
 
-<div align="center" style="{{ 'display:none' if hide_navigation else '' }}">
-        <p>
-            stage: {{current_stage}} of  {{max_stage}}
-        </p>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="key" value="payment_reference">
+                                    <i class="input-helper"></i>
+                                    Payment Reference
+                                </label>
+                            </div>
 
-        <button class="btn-save btn btn-primary btn-sm" name="action" value="previous" type="submit" {{ 'disabled' if previous_disable else '' }} >previous</button>
-        <button class="btn-save btn btn-primary btn-sm" name="action" value="next" type="submit" {{ 'disabled' if next_disable else '' }} >next</button>
-        <br><br>
-        <button class="btn-save btn btn-primary btn-sm" name="action" value="export" type="submit" >Export to Excel</button>
+
+                            <div class="form-group form-group--float">
+                                <span class="input-group-addon">
+                                    <i class="zmdi zmdi-edit"></i>
+                                </span>
+                                <div>
+                                    <input type="text" name="value" class="form-control" required>
+                                    <i class="form-group__bar"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; margin-left: 45%">
+                            <button type="submit" name="action" value="history" class="btn btn--light btn--icon-text"><i class="zmdi zmdi-search"></i> Search history</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-    </form>
 
-    <div class="container-fluid">
-        <div class="col-md-auto">
-            <table id="example" class="table table-compact table-bordered table-hover" style="width:100%" cellpadding="0">
+<div class="card">
+    <div class="card__body">
+        <div class="table-responsive">
+            <table id="data-table-selection" class="table-striped table-hover">
                 <thead>
                 <tr>
-                    <th data-column-id="date">Date</th>
-                    <th data-column-id="date_created">Date Created</th>
-                    <th data-column-id="order_id">Order Id</th>
-                    <th data-column-id="payment_amount">Payment Amount</th>
-                    <th data-column-id="payment_type">Payment Type</th>
-                    <th data-column-id="payment_reference">Payment Reference</th>
-                    <th data-column-id="status">Status</th>
-                    <th data-column-id="error_type">Error Type</th>
-                    <th data-column-id="difference">Difference</th>
+                    <th data-column-id="primary_id" data-identifier="true">ID</th>
+                    <th data-column-id="date">date</th>
+                    <th data-column-id="date_created">date_created</th>
+                    <th data-column-id="order_id">order_id</th>
+                    <th data-column-id="payment_amount">payment_amount</th>
+                    <th data-column-id="payment_type">payment_type</th>
+                    <th data-column-id="payment_reference">payment_reference</th>
+                    <th data-column-id="status">status</th>
+                    <th data-column-id="error_type">error_type</th>
+                    <th data-column-id="difference">difference</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for row in rows %}
                     <tr>
+                        <td>{{row['primary_id']}}</td>
                         <td>{{row['date']}}</td>
                         <td>{{row['date_created']}}</td>
                         <td>{{row['order_id']}}</td>
                         <td>{{row['payment_amount']}}</td>
                         <td>{{row['payment_type']}}</td>
-                        <td class="nowrap">{{row['payment_reference']}}</td>
+                        <td>{{row['payment_reference']}}</td>
                         <td>{{row['status']}}</td>
                         <td>{{row['error_type']}}</td>
                         <td>{{row['difference']}}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
-                <tfoot>
-                <tr>
-                    <th>date</th>
-                    <th>date_created</th>
-                    <th>order_id</th>
-                    <th>payment_amount</th>
-                    <th>payment_type</th>
-                    <th>payment_reference</th>
-                    <th>status</th>
-                    <th>error_type</th>
-                    <th>difference</th>
-                </tr>
-                </tfoot>
             </table>
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+
+ <!-- Javascript Libraries -->
+
+<!-- jQuery -->
+<script src="{{ url_for('static', filename='vendors/bower_components/jquery/dist/jquery.js')}}"></script>
+
+<!-- Bootstrap -->
+<script src="{{ url_for('static', filename='vendors/bower_components/bootstrap/dist/js/bootstrap.js')}}"></script>
+
+<!-- Select 2 -->
+<script src="{{ url_for('static', filename='vendors/bower_components/select2/dist/js/select2.full.js')}}"></script>
+
+<script src="{{ url_for('static', filename='demo/js/data-table.js')}}"></script>
+
+<script src="{{ url_for('static', filename='vendors/bower_components/jquery.bootgrid/dist/jquery.bootgrid.js')}}"></script>
+
+<script src="{{ url_for('static', filename='vendors/bower_components/twitter-bootstrap-wizard/jquery.bootstrap.wizard.js')}}"></script>
+
 <script type="text/javascript">
     $(document).ready(function() {
-    // Setup - add a text input to each footer cell
-    $('#example tfoot th').each( function () {
-        var title = $(this).text();
-        $(this).html( '<input type="text" placeholder="'+title+'" />' );
-    } );
-
-    // DataTable
-    var table = $('#example').DataTable();
-
-    // Apply the search
-    table.columns().every( function () {
-
-        var that = this;
-        $( 'input', this.footer() ).on( 'keyup change', function () {
-            if ( that.search() !== this.value ) {
-                that
-                    .search( this.value )
-                    .draw();
-            }
-        } );
-    } );
-} );
-</script>
-<script type="text/javascript">
-    var expanded = false;
-
-    function showCheckboxes() {
-        var checkboxes = document.getElementById("checkboxes");
-        if (!expanded) {
-            checkboxes.style.display = "block";
-            expanded = true;
-        } else {
-            checkboxes.style.display = "none";
-            expanded = false;
-  }
-}
+        $('select.select2').select2({
+            dropdownAutoWidth: false,
+            width: '500px',
+        });});
 </script>
 </body>
 </html>
