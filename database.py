@@ -307,6 +307,8 @@ def update_daily_analysis_table(table_name, data):
             key_2 = trans[9]
             difference = trans[10]
             error_type = trans[11]
+            if check_solved_table(key_1, key_2, cursor):
+                error_type='4'
             query = f"INSERT INTO {table_name} " \
                     f"(id, date, date_created, order_id, payment_amount, payment_type, " \
                     f"payment_reference, status, key_1, key_2, error_type, difference, queue) " \
@@ -511,11 +513,39 @@ def get_daily_tables():
     result = cursor.execute(query).fetchall()
     return result
 
+def create_solved_table():
+    conn, cursor = open_connection(config.database_name)
+    try:
+        query = f"CREATE TABLE {config.solved_table} " \
+                f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, " \
+                f"key_1 varchar, key_2 varchar)"
+        cursor.execute(query)
+    except:
+        pass
+    close_connection(conn, cursor)
+def update_solved_table(key1, key2):
+    conn, cursor = open_connection(config.database_name)
+    # checking existence of log for particular date
+    check_date = f"SELECT * FROM {config.solved_table} WHERE key_1='{key1} OR key_2='{key2}'"
+    result = cursor.execute(check_date).fetchall()
+    if len(result) == 0:
+        query = f"INSERT INTO {config.solved_table} (key_1, key_2) VALUES ('{key1}', '{key2}')"
+    cursor.execute(query)
+    close_connection(conn, cursor)
+def check_solved_table(key1, key2, cursor):
+    check_query = f"SELECT * FROM {config.solved_table} WHERE key_1='{key1} OR key_2='{key2}')"
+    result = cursor.execute(check_query).fetchall()
+    if len(result) == 0:
+        return False
+    else:
+        return True
+
 create_messages_table()
 create_payment_trans_table()
 create_log_table()
 create_users_table()
 create_daily_tables_table()
+create_solved_table()
 
 
 
