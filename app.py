@@ -4,31 +4,32 @@ from flask import Flask, render_template, request, send_from_directory
 import config
 import database
 import form_processor
-import load_attachments
+import gmail
 
 app = Flask(__name__)
 
 
-def get_analyse(user_ip, date_from, date_to, payment_systems):
-    load_attachments.load()
-    report_table_name = form_processor.get_report_table_name(user_ip)
-    current_stage, max_stage = form_processor.make_report(date_from, date_to, report_table_name, payment_systems, latest=True)
+def get_analyse(user_ip, date_from, date_to, payment_systems, company):
+    gmail.load(company)
+    report_table_name = form_processor.get_report_table_name(user_ip, company)
+    current_stage, max_stage = form_processor.make_report(date_from, date_to, report_table_name, payment_systems,
+                                                          company, latest=True)
     database.update_users_table(user_ip, max_stage, max_stage, report_table_name)
     rows = database.get_report_table_rows(report_table_name)
     back_disable = True if max_stage < 2 else False
     forward_disable = True
     return rows, back_disable, forward_disable, max_stage
 
-def get_stage(user_ip, date_from, date_to, payment_systems, action):
+def get_stage(user_ip, date_from, date_to, payment_systems, company, action):
     current_stage, max_stage, report_table_name = database.get_users_table(user_ip)
     database.drop_table(report_table_name)
     if action == 'back':
         current_stage, max_stage = form_processor.make_report(date_from, date_to,
-                                                              report_table_name, payment_systems,
+                                                              report_table_name, payment_systems, company,
                                                               latest=False, stage=current_stage - 1)
     elif action == 'forward':
         current_stage, max_stage = form_processor.make_report(date_from, date_to,
-                                                              report_table_name, payment_systems,
+                                                              report_table_name, payment_systems, company,
                                                               latest=False, stage=current_stage + 1)
     database.update_users_table(user_ip, current_stage, max_stage, report_table_name)
     rows = database.get_report_table_rows(report_table_name)
@@ -60,19 +61,19 @@ def submit():
         user_ip = request.remote_addr
         date_from = request.form.get('date_from')
         date_to = request.form.get('date_to')
-
         payment_systems = request.form.getlist('payment_systems')
-        # one of four actions: analyse, previous, next, export
+        company = request.form.get('company')
         action = request.form.get('action')
         if action == 'analyse':
-            rows, back_disable, forward_disable, max_stage = get_analyse(user_ip, date_from, date_to, payment_systems)
+            rows, back_disable, forward_disable, max_stage = get_analyse(user_ip, date_from, date_to, payment_systems, company)
+            print(database.open_counter)
             return render_template('Choco.html', rows=rows, back_disable=back_disable, forward_disable=forward_disable,
                                    hide_navigation=False, current_stage=max_stage, max_stage=max_stage,
                                    analyse_active=True, history_active=False)
         if action == 'back' or action == 'forward':
             rows, back_disable, forward_disable, current_stage, max_stage = get_stage(user_ip, date_from,
                                                                                        date_to, payment_systems,
-                                                                                       action)
+                                                                                       company, action)
             return render_template('Choco.html', rows=rows, back_disable=back_disable, forward_disable=forward_disable,
                                    hide_navigation=False, current_stage=current_stage, max_stage=max_stage,
                                    analyse_active=True, history_active=False)

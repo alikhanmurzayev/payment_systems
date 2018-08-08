@@ -15,16 +15,16 @@ def get_date_interval(date_from, date_to):
         date_interval.append(date_temp.date())
         date_temp += datetime.timedelta(1)
     return date_interval
-def get_daily_table_name(day):
-    day = str(day).replace('-', '_')
+def get_daily_table_name(day, company):
+    day = company + '_' + str(day).replace('-', '_')
     return 'daily_' + day
-def get_api_response(day):
-    json_file_name = get_daily_table_name(day) + '.json'
+def get_api_response(day, company):
+    json_file_name = get_daily_table_name(day, company) + '.json'
     with open(json_file_name) as f:
         return json.load(f)
-def get_report_table_name(user_ip):
+def get_report_table_name(user_ip, company):
     user_ip = str(user_ip).replace('.', '_')
-    table_name = 'report' + '_' + user_ip
+    table_name = 'report' + '_' + company + '_' + user_ip
     return table_name
 def get_history_table_name(key, value):
     table_name = key + '_' + str(value)
@@ -49,7 +49,7 @@ def combine_errors(first_error_table, second_error_table, third_error_table):
         resultant_table.append(trans)
     return resultant_table
 
-def make_daily_analysis(date_interval):
+def make_daily_analysis(date_interval, company):
     payment_temp_table = 'payment_temp'
     choco_temp_table = 'choco_temp'
     first_error_table = 'first_error'
@@ -58,10 +58,10 @@ def make_daily_analysis(date_interval):
     for d in date_interval:
         # transactions from payment systems
         database.create_payment_trans_temp_table(payment_temp_table)
-        data = database.get_daily_payment_trans(d)
+        data = database.get_daily_payment_trans(d, company)
         database.update_payment_trans_temp_table(payment_temp_table, data)
         # transactions from choco's servers
-        transactions = get_api_response(d)
+        transactions = get_api_response(d, company)
         database.create_choco_temp_table(choco_temp_table)
         date, date_created, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2 = read_json.read_api_response(
             transactions)
@@ -86,7 +86,7 @@ def make_daily_analysis(date_interval):
         database.clear_error_table_by_keys(second_error_table, keys)
         # combine three tables with errors into one
         errors = combine_errors(first_error_table, second_error_table, third_error_table)
-        daily_table_name = get_daily_table_name(d)
+        daily_table_name = get_daily_table_name(d, company)
         database.create_daily_analysis_table(daily_table_name)
         database.update_daily_tables_table(d)
         database.update_daily_analysis_table(daily_table_name, errors)
@@ -98,22 +98,22 @@ def make_daily_analysis(date_interval):
         database.drop_table(second_error_table)
         database.drop_table(third_error_table)
 
-def justify_log_len(date_interval):
+def justify_log_len(date_interval, company):
     max_len = 0
     for d in date_interval:
-        log = database.get_log_by_date(d)
+        log = database.get_log_by_date(d, company)
         log = log[0][0]
         log = log.split()
         max_len = max(len(log), max_len)
     for d in date_interval:
-        log = database.get_log_by_date(d)
+        log = database.get_log_by_date(d, company)
         log = log[0][0]
         log = log.split()
         latest_queue = log[-1]
         for i in range(max_len - len(log)):
             log.append(latest_queue)
         log = ' '.join(log)
-        database.update_log_table(d, log)
+        database.update_log_table(d, company, log)
 
 def clear_log(log_list):
     stages = list()
@@ -133,11 +133,11 @@ def clear_log(log_list):
             del log_list[i][j]
     return log_list
 
-def make_log(date_interval):
+def make_log(date_interval, company):
     for d in date_interval:
-        daily_table_name = get_daily_table_name(d)
+        daily_table_name = get_daily_table_name(d, company)
         latest_queue = str(database.get_latest_queue(daily_table_name))
-        log = database.get_log_by_date(d)
+        log = database.get_log_by_date(d, company)
         if len(log) == 0:
             log = str(latest_queue)
         else:
@@ -146,16 +146,16 @@ def make_log(date_interval):
             if log[-1] != latest_queue:
                 log.append(latest_queue)
             log = ' '.join(log)
-        database.update_log_table(d, log)
-    justify_log_len(date_interval)
+        database.update_log_table(d, company, log)
+    justify_log_len(date_interval, company)
 
-def make_report(date_from, date_to, report_table_name, payment_systems,latest=True, stage=1):
+def make_report(date_from, date_to, report_table_name, payment_systems, company, latest=True, stage=1):
     date_interval = get_date_interval(date_from, date_to)
-    make_daily_analysis(date_interval)
-    make_log(date_interval)
+    make_daily_analysis(date_interval, company)
+    make_log(date_interval, company)
     log_list = list()
     for d in date_interval:
-        log = database.get_log_by_date(d)
+        log = database.get_log_by_date(d, company)
         log = log[0][0].split()
         log_list.append(log)
     log_list = clear_log(log_list)
@@ -166,7 +166,7 @@ def make_report(date_from, date_to, report_table_name, payment_systems,latest=Tr
         stage_list.append(log[stage-1])
     report_table = list()
     for i in range(len(date_interval)):
-        daily_table_name = get_daily_table_name(date_interval[i])
+        daily_table_name = get_daily_table_name(date_interval[i], company)
         temp_table = database.get_daily_analysis_table(daily_table_name, payment_systems, latest=False, queue=stage_list[i])
         report_table += temp_table
     database.drop_table(report_table_name)
@@ -174,13 +174,13 @@ def make_report(date_from, date_to, report_table_name, payment_systems,latest=Tr
     database.update_report_table(report_table_name, report_table)
     return stage, len(log_list[0])
 
-def make_history_table(key, value):
+def make_history_table(key, value, company):
     value = str(value)
     dates = database.get_daily_tables()
     daily_tables = list()
     for date in dates:
         date = date[0]
-        table_name = get_daily_table_name(date)
+        table_name = get_daily_table_name(date, company)
         daily_tables.append(table_name)
     daily_tables.sort()
     full_list = list()

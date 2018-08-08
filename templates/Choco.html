@@ -76,6 +76,14 @@
                                     <option value="qiwi" {{ 'selected' if 'qiwi' in request.form.getlist('payment_systems') else '' }}> Qiwi</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <select class="select2" data-minimum-results-for-search="Infinity" name="company">
+                                    <option value="chocotravel" {{ 'selected' if 'chocotravel' == request.form.get('company') else '' }}>ChocoTravel</option>
+                                    <option value="chocolife" {{ 'selected' if 'chocolife' == request.form.get('company') else '' }}>ChocoLife</option>
+                                    <option value="chocofood" {{ 'selected' if 'chocofood' == request.form.get('company') else '' }}>ChocoFood</option>
+                                    <option value="rahmet" {{ 'selected' if 'rahmet' == request.form.get('company') else '' }}>Rahmet</option>
+                                </select>
+                            </div>
                         </div>
                         <div style="margin-top: 15px; margin-left: 45%">
                             <button class="btn btn--light btn--icon-text" name="action" value="analyse" type="submit"><i class="zmdi zmdi-flip"></i>Analyse</button>

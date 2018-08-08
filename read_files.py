@@ -1,5 +1,6 @@
 import pandas
 import datetime
+import os
 
 import config
 import database
@@ -21,8 +22,7 @@ def get_key_2(date, common_key, status):
     return key
 
 
-def read_kaspi(file_name):
-    file_path = config.attachment_dir + '/' + file_name
+def read_kaspi(file_path):
     file = pandas.read_excel(file_path, skiprows=0, skipfooter=0)
     date = file['Дата транзакции']
     order_id = file['Номер бронирования']
@@ -41,8 +41,7 @@ def read_kaspi(file_name):
     key_1 = get_key_1(date, order_id, payment_amount, status)
     key_2 = get_key_2(date, order_id, status)
     return date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2
-def read_rps(file_name):
-    file_path = config.attachment_dir + '/' + file_name
+def read_rps(file_path):
     file = pandas.read_excel(file_path, skiprows=1, skipfooter=1)
     date = file['Дата']
     order_id = file['Номер брони']
@@ -61,8 +60,7 @@ def read_rps(file_name):
     key_1 = get_key_1(date, order_id, payment_amount, status)
     key_2 = get_key_2(date, order_id, status)
     return date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2
-def read_processing(file_name):
-    file_path = config.attachment_dir + '/' + file_name
+def read_processing(file_path):
     file = pandas.read_excel(file_path, skiprows=4, skipfooter=0)
     date = file['AlmDate']
     order_id = file['Order ID']
@@ -85,8 +83,7 @@ def read_processing(file_name):
     key_1 = get_key_1(date, order_id, payment_amount, status)
     key_2 = get_key_2(date, order_id, status)
     return date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2
-def read_qazkom(file_name):
-    file_path = config.attachment_dir + '/' + file_name
+def read_qazkom(file_path):
     file = pandas.read_html(file_path)
     # concatenate all the tables that contain needed information
     total_table = list()
@@ -118,29 +115,25 @@ def read_qazkom(file_name):
     return date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2
 
 
-def files_into_database(file_names):
+def files_into_database(file_names, company):
     for file_name in file_names:
         payment_type = ''
+        file_path = os.path.join(config.attachment_dir, company, file_name)
 
         # kaspi
         if file_name.count(config.kaspi_name) != 0:
-            date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2 = read_kaspi(file_name)
+            date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2 = read_kaspi(file_path)
         # rps
         if file_name.count(config.rps_name) != 0:
-            date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2 = read_rps(file_name)
+            date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2 = read_rps(file_path)
         # processing
         if file_name.count(config.processing_name) != 0:
-            date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2 = read_processing(file_name)
+            date, order_id, payment_amount, payment_type, payment_reference, status, key_1, key_2 = read_processing(file_path)
         # qazkom
         if file_name.count(config.qazkom_name) != 0:
-            date, order_id, payment_amount, payment_type, payment_reference, status, key_2, key_2 = read_qazkom(file_name)
+            date, order_id, payment_amount, payment_type, payment_reference, status, key_2, key_2 = read_qazkom(file_path)
 
         if payment_type:
             date_created = datetime.datetime.now()
             database.update_payment_trans_table(date, date_created, order_id, payment_amount,
-                   payment_type, payment_reference, status, key_1, key_2)
-
-
-
-
-
+                   payment_type, payment_reference, status, key_1, key_2, company)

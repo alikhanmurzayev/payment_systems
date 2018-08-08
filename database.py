@@ -1,10 +1,15 @@
 import sqlite3
 import pandas
 import os
+import datetime
 
 import config
 
+open_counter = 0
+
 def open_connection(database_name):
+    global open_counter
+    open_counter += 1
     conn = sqlite3.connect(database_name)
     cursor = conn.cursor()
     return conn, cursor
@@ -23,35 +28,67 @@ def drop_table(table_name):
         pass
     close_connection(conn, cursor)
 
+def create_companies_table():
+    conn, cursor = open_connection(config.database_name)
+    # Create database if it does not exist
+    try:
+        query = f"CREATE TABLE {config.companies_table} " \
+                f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, company varchar, " \
+                f"email varhcar, password varchar)"
+        cursor.execute(query)
+    except:
+        pass
+    close_connection(conn, cursor)
+def update_companies_table(company, email, password):
+    conn, cursor = open_connection(config.database_name)
+    check_existence = f"SELECT * FROM {config.companies_table} WHERE company='{company}'"
+    result = cursor.execute(check_existence).fetchall()
+    if len(result) == 0:
+        query = f"INSERT INTO {config.companies_table} (company, email, password) " \
+                f"VALUES ('{company}', '{email}', '{password}')"
+        cursor.execute(query)
+    close_connection(conn, cursor)
+def get_company(company):
+    conn, cursor = open_connection(config.database_name)
+    # Create database if it does not exist
+    query = f"SELECT email, password FROM {config.companies_table} WHERE company='{company}'"
+    result = cursor.execute(query).fetchall()
+    close_connection(conn, cursor)
+    return result[0][0], result[0][1]
+
+
+
 def create_messages_table():
     conn, cursor = open_connection(config.database_name)
     # Create database if it does not exist
     try:
         query = f"CREATE TABLE {config.messages_table} " \
-                f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, message_id int)"
+                f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, message_id int, " \
+                f"company varchar)"
         cursor.execute(query)
     except:
         pass
     close_connection(conn, cursor)
-def get_unread_messages(id_list):
+def get_unread_messages(id_list, company):
     conn, cursor = open_connection(config.database_name)
     unread_id = list()
     for message_id in id_list:
         message_id_int = int(message_id)
-        query = f"SELECT * FROM {config.messages_table} WHERE message_id='{message_id_int}'"
+        query = f"SELECT * FROM {config.messages_table} WHERE message_id='{message_id_int}' " \
+                f"and company='{company}'"
         result = cursor.execute(query).fetchall()
         if len(result) == 0:
             unread_id.append(message_id)
     close_connection(conn, cursor)
     return unread_id
-def add_messages(message_id_list):
+def add_messages(message_id_list, company):
     conn, cursor = open_connection(config.database_name)
     for message_id in message_id_list:
         message_id = int(message_id)
-        query = f"INSERT INTO {config.messages_table} (message_id) VALUES ('{message_id}')"
+        query = f"INSERT INTO {config.messages_table} (message_id, company) " \
+                f"VALUES ('{message_id}', '{company}')"
         cursor.execute(query)
     close_connection(conn, cursor)
-
 
 
 def create_payment_trans_table():
@@ -61,27 +98,29 @@ def create_payment_trans_table():
         query = f'CREATE TABLE {config.payment_trans_table} ' \
                 f'(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, date date, date_created date, ' \
                 f'order_id varchar, payment_amount double, payment_type varchar, ' \
-                f'payment_reference varchar, status int, key_1 varchar, key_2 varchar)'
+                f'payment_reference varchar, status int, key_1 varchar, key_2 varchar, company varchar)'
         cursor.execute(query)
     except:
         pass
     close_connection(conn, cursor)
 def update_payment_trans_table(date, date_created, order_id, payment_amount,
-                                      payment_type, payment_reference, status, key_1, key_2):
+                                      payment_type, payment_reference, status, key_1, key_2, company):
     conn, cursor = open_connection(config.database_name)
     for i in range(len(date)):
-        check_existence = f"SELECT * FROM {config.payment_trans_table} WHERE key_1='{key_1[i]}'"
+        check_existence = f"SELECT * FROM {config.payment_trans_table} WHERE key_1='{key_1[i]}' " \
+                          f"and company='{company}'"
         result = cursor.execute(check_existence).fetchall()
         if len(result) == 0:
             query = f"INSERT INTO {config.payment_trans_table} (date, date_created, order_id, " \
-                    f"payment_amount, payment_type, payment_reference, status, key_1, key_2)" \
+                    f"payment_amount, payment_type, payment_reference, status, key_1, key_2, company)" \
                     f"VALUES ('{date[i].date()}', '{date_created}', '{order_id[i]}', '{payment_amount[i]}', " \
-                    f"'{payment_type}', '{payment_reference[i]}', '{status[i]}', '{key_1[i]}', '{key_2[i]}')"
+                    f"'{payment_type}', '{payment_reference[i]}', '{status[i]}', '{key_1[i]}', '{key_2[i]}', " \
+                    f"'{company}')"
             cursor.execute(query)
     close_connection(conn, cursor)
-def get_daily_payment_trans(date):
+def get_daily_payment_trans(date, company):
     conn, cursor = open_connection(config.database_name)
-    query = f"SELECT * FROM {config.payment_trans_table} WHERE date='{date}'"
+    query = f"SELECT * FROM {config.payment_trans_table} WHERE date='{date}' and company='{company}'"
     result = cursor.execute(query).fetchall()
     close_connection(conn, cursor)
     return result
@@ -324,7 +363,7 @@ def get_latest_queue(table_name):
     queue = int(result[-1][-1])
     close_connection(conn, cursor)
     return queue
-def get_daily_analysis_table(table_name, payment_systems,latest=True, queue=1):
+def get_daily_analysis_table(table_name, payment_systems, latest=True, queue=1):
     conn, cursor = open_connection(config.database_name)
     if latest:
         latest_queue_query = f"SELECT queue FROM {table_name}"
@@ -387,26 +426,26 @@ def create_log_table():
     try:
         query = f"CREATE TABLE {config.log_table} " \
                 f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, " \
-                f"date date, log varchar)"
+                f"date date, company varchar, log varchar)"
         cursor.execute(query)
     except:
         pass
     close_connection(conn, cursor)
-def get_log_by_date(date):
+def get_log_by_date(date, company):
     conn, cursor = open_connection(config.database_name)
-    query = f"SELECT log FROM {config.log_table} where date='{date}'"
+    query = f"SELECT log FROM {config.log_table} where date='{date}' and company='{company}'"
     result = cursor.execute(query).fetchall()
     close_connection(conn, cursor)
     return result
-def update_log_table(date, log):
+def update_log_table(date, company, log):
     conn, cursor = open_connection(config.database_name)
     # checking existence of log for particular date
-    check_date = f"SELECT * FROM {config.log_table} WHERE date='{date}'"
+    check_date = f"SELECT * FROM {config.log_table} WHERE date='{date}' and company='{company}'"
     result = cursor.execute(check_date).fetchall()
     if len(result) == 0:
-        query = f"INSERT INTO {config.log_table} (date, log) VALUES ('{date}', '{log}')"
+        query = f"INSERT INTO {config.log_table} (date, company, log) VALUES ('{date}', '{company}', '{log}')"
     else:
-        query = f"UPDATE {config.log_table} SET log='{log}' WHERE date='{date}'"
+        query = f"UPDATE {config.log_table} SET log='{log}' WHERE date='{date}' and company='{company}'"
     cursor.execute(query)
     close_connection(conn, cursor)
 
@@ -516,8 +555,11 @@ create_payment_trans_table()
 create_log_table()
 create_users_table()
 create_daily_tables_table()
-
-
+################################
+create_companies_table()
+update_companies_table('chocotravel', 'chococasetest@gmail.com', 'kanatakbayev')
+update_companies_table('chocolife', 'salambayev.choco@gmail.com', 'S31Amchina')
+################################
 
 
 if not os.path.exists(config.attachment_dir):
@@ -525,3 +567,11 @@ if not os.path.exists(config.attachment_dir):
 
 if not os.path.exists(config.reports_dir):
     os.makedirs(config.reports_dir)
+
+print(datetime.datetime.now())
+conn, cursor = open_connection(config.database_name)
+close_connection(conn, cursor)
+print(datetime.datetime.now())
+
+
+

@@ -1,11 +1,9 @@
-username = 'chococasetest@gmail.com'
-password = 'kanatakbayev'
-
 mail_format = '(RFC822)'
 
 
 # Database tables, names, e.t.c.
 database_name = 'TheBestDatabase.db'
+companies_table = 'companies'
 messages_table = 'messages'
 payment_trans_table = 'payment_trans'
 choco_table = 'choco'
@@ -17,6 +15,7 @@ status_payment = '1'
 status_refund = '2'
 
 attachment_dir = 'Attachments'
+
 reports_dir = 'Reports'
 
 
