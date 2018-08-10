@@ -23,18 +23,18 @@
 <div class="content--boxed-sm">
     <div class="card profile">
         <header class="profile__img">
-            <h2>{{ session['login'] }}</h2>
+            <h2>{{ name }} {{ surname }}: {{ role }}</h2>
         </header>
         <div class="profile__img">
-            <img src="https://pp.userapi.com/WKojaSO5bGz5RaUQEfxNsz-rroWSuqAaskJK_Q/vxJQ-CX7Cfs.jpg" alt="">
+            <img src="{{ photo }}" alt="">
         </div>
         <div class="profile__info">
-            <p>Experienced Lead Software Engineer with a demonstrated history of working in the computer software industry. Skilled in Python, SQL, PHP, Databases, and Linux. Strong engineering professional with a Master of Science (MSc) focused in Computer Science from The University of Manchester.</p>
+            <p style="margin-top: 8%">{{ description }}</p>
             <ul class="icon-list">
-                <li><i class="zmdi zmdi-phone"></i> 34ny4t 24/7</li>
-                <li><i class="zmdi zmdi-email"></i> badboynonetvoy@chocotravel.me</li>
+                <li><i class="zmdi zmdi-phone"></i> {{ phone }}</li>
+                <li><i class="zmdi zmdi-email"></i> {{ email }}</li>
                 <form action="{{ url_for('start_analyse') }}">
-                    <div style="margin-top: 15px; margin-left: 50%">
+                    <div style="margin-top: 15px; margin-left: 50%; {{ 'display:none' if role != 'appointee' else '' }}">
                         <button type="submit" name="action" value="analyse" class="btn btn--light btn--icon-text">
                             <i class="zmdi zmdi-flip"></i> Analyse
                         </button>
@@ -44,7 +44,7 @@
         </div>
         <form>
             <div>
-               <button type="button" name="action" value="logout" class="btn btn--light btn--icon-text">
+               <button type="submit" action="{{ url_for('logout') }}" value="logout" class="btn btn--light btn--icon-text">
                     <i class="zmdi zmdi-block-alt"></i> LogOut
                 </button>
             </div>

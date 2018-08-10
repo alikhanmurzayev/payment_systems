@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 import os
 
 import database
@@ -41,10 +41,16 @@ def logout():
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html')
+    if 'login' not in session:
+        return redirect(url_for('login'))
+    login, password, role, name, surname, description, email, phone, photo = database.get_user(session['login'])
+    return render_template('profile.html', name=name, surname=surname, role=role, description=description, email=email,
+                           phone=phone, photo=photo)
 
 @app.route('/start_analyse')
 def start_analyse():
+    if 'login' not in session:
+        return login()
     return render_template('analyse.html', hide_navigation=True, analyse_active=True, history_active=False)
 
 @app.route('/analyse', methods=['GET', 'POST'])

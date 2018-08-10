@@ -531,18 +531,21 @@ def create_users_table():
     try:
         query = f"CREATE TABLE {config.users_table} " \
                 f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, " \
-                f"login varchar, password varchar, role varchar)"
+                f"login varchar, password varchar, role varchar, " \
+                f"name varchar, surname varchar, description varchar, " \
+                f"email varchar, phone varchar, photo varchar)"
         cursor.execute(query)
     except:
         pass
     close_connection(conn, cursor)
-def add_user(login, password, role):
+def add_user(login, password, role, name, surname, description, email, phone, photo):
     conn, cursor = open_connection(config.database_name)
     check_existence = f"SELECT * FROM {config.users_table} WHERE login='{login}'"
     result = cursor.execute(check_existence).fetchall()
     if len(result) == 0:
-        query = f"INSERT INTO {config.users_table} (login, password, role) " \
-                f"VALUES ('{login}', '{password}', '{role}')"
+        query = f"INSERT INTO {config.users_table} (login, password, role, name, surname, description, " \
+                f"email, phone, photo) VALUES ('{login}', '{password}', '{role}', '{name}', '{surname}', " \
+                f"'{description}', '{email}', '{phone}', '{photo}')"
         cursor.execute(query)
     close_connection(conn, cursor)
 def check_user(login, password):
@@ -554,8 +557,21 @@ def check_user(login, password):
         if result[0][0] == password and password != '':
             return True
     return False
-
-
+def get_user(login):
+    conn, cursor = open_connection(config.database_name)
+    query = f"SELECT * FROM {config.users_table} WHERE login='{login}'"
+    result = cursor.execute(query).fetchall()[0]
+    close_connection(conn, cursor)
+    login = result[1]
+    password = result[2]
+    role = result[3]
+    name = result[4]
+    surname = result[5]
+    description = result[6]
+    email = result[7]
+    phone = result[8]
+    photo = result[9]
+    return login, password, role, name, surname, description, email, phone, photo
 
 
 def create_daily_tables_table():
@@ -593,9 +609,8 @@ update_companies_table('chocotravel', 'chococasetest@gmail.com', 'kanatakbayev')
 update_companies_table('chocolife', 'salambayev.choco@gmail.com', 'S31Amchina')
 ################################
 create_users_table()
-add_user('1', '1', 'appointee')
-add_user('2', '2', 'executor')
-add_user('3', '3', 'executor')
+add_user('1', '1', 'appointee', 'Kanat', 'Akbayev', 'Some description', 'badbounonetvoy@chocolife.me', '87451254478', 'https://instagram.fhel5-1.fna.fbcdn.net/vp/6aa88d72b768fa7230146dc1b5a75f02/5C0D158A/t51.2885-15/e15/11380745_386663584857955_288199800_n.jpg')
+add_user('2', '2', 'executor', 'Alexey', 'Navalny', 'Future president of Russian Federation...', 'badbounonetvoy2@chocolife.me', '87451254468', 'http://geohistory.today/wp-content/uploads/2017/10/opening-777x437.jpg')
 
 
 if not os.path.exists(config.attachment_dir):
