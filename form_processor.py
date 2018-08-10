@@ -2,10 +2,12 @@ import datetime
 import pandas
 import json
 import itertools
+from flask import send_from_directory
 
 import database
 import read_json
 import config
+import gmail
 
 
 def get_date_interval(date_from, date_to):
@@ -198,5 +200,51 @@ def make_history_table(key, value, company):
     return history_table_name
 
 
+# form functions
 
+def get_analyse(login, date_from, date_to, payment_systems, company, previous=False):
+    if previous:
+        current_stage, max_stage, report_table_name = database.get_working_table(login)
+        rows = database.get_report_table_rows(report_table_name)
+        back_disable = True if current_stage < 2 else False
+        forward_disable = True if current_stage >= max_stage else False
+        return rows, back_disable, forward_disable, max_stage
+    gmail.load(company)
+    report_table_name = get_report_table_name(login, company)
+    current_stage, max_stage = make_report(date_from, date_to, report_table_name, payment_systems,
+                                                          company, latest=True)
+    database.update_working_table(login, max_stage, max_stage, report_table_name)
+    rows = database.get_report_table_rows(report_table_name)
+    back_disable = True if max_stage < 2 else False
+    forward_disable = True
+    return rows, back_disable, forward_disable, max_stage
+
+def get_stage(login, date_from, date_to, payment_systems, company, action):
+    current_stage, max_stage, report_table_name = database.get_working_table(login)
+    database.drop_table(report_table_name)
+    if action == 'back':
+        current_stage, max_stage = make_report(date_from, date_to,
+                                                              report_table_name, payment_systems, company,
+                                                              latest=False, stage=current_stage - 1)
+    elif action == 'forward':
+        current_stage, max_stage = make_report(date_from, date_to,
+                                                              report_table_name, payment_systems, company,
+                                                              latest=False, stage=current_stage + 1)
+    database.update_working_table(login, current_stage, max_stage, report_table_name)
+    rows = database.get_report_table_rows(report_table_name)
+    previous_disable = True if current_stage < 2 else False
+    next_disable = True if current_stage >= max_stage else False
+    return rows, previous_disable, next_disable, current_stage, max_stage
+
+def get_excel(login, date_from, date_to):
+    current_stage, max_stage, report_table_name = database.get_working_table(login)
+    file_name = database.export_to_excel(report_table_name)
+    file_path = config.reports_dir
+    report_name = str(current_stage) + '_' + report_table_name + '_' + str(date_from).replace('-', '.') + '-' + str(date_to).replace('-', '.') + '.xlsx'
+    return send_from_directory(file_path + '/', file_name, as_attachment=True, attachment_filename=report_name)
+
+def get_history(key, value, company):
+    history_table_name = make_history_table(key, value, company)
+    rows = database.get_report_table_rows(history_table_name)
+    return rows
 

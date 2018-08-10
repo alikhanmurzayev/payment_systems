@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-{% extends 'layout.html' %}
-{% block body %}
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -10,55 +8,244 @@
 
         <!-- Vendors -->
 
-        <!-- Animate CSS -->
-        <link href="{{ url_for('static', filename='vendors/bower_components/animate.css/animate.css') }}" rel="stylesheet">
+    <!-- Material Design Icons -->
+    <link href="{{ url_for('static', filename='vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css') }}" rel="stylesheet">
 
-        <!-- Material Design Icons -->
-        <link href="{{ url_for('static', filename='vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css') }}" rel="stylesheet">
+    <!-- Select 2 -->
+    <link href="{{ url_for('static', filename='vendors/bower_components/select2/dist/css/select2.min.css') }}" rel="stylesheet">
 
-        <!-- Malihu Scrollbar -->
-        <link href="{{ url_for('static', filename='vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') }}" rel="stylesheet">
+    <!-- Site CSS -->
+    <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
 
-        <!-- Light Gallery -->
-        <link href="{{ url_for('static', filename='vendors/bower_components/lightgallery/dist/css/lightgallery.css') }}" rel="stylesheet">
-
-        <!-- Site CSS -->
-        <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
-
-        <!-- Page loader -->
-        <script src="{{ url_for('static', filename='js/page-loader.js') }}"></script>
+    <link href="{{ url_for('static', filename='vendors/bower_components/jquery.bootgrid/dist/jquery.bootgrid.css') }}" rel="stylesheet">
     </head>
-<body>
-
+<body class="card">
 <div class="content--boxed-sm">
     <div class="card profile">
         <header class="profile__img">
-            <h2>{{ session['login'] }} <small>Head of IT department</small></h2>
+            <h2>{{ session['login'] }}</h2>
         </header>
         <div class="profile__img">
             <img src="https://pp.userapi.com/WKojaSO5bGz5RaUQEfxNsz-rroWSuqAaskJK_Q/vxJQ-CX7Cfs.jpg" alt="">
         </div>
         <div class="profile__info">
             <p>Experienced Lead Software Engineer with a demonstrated history of working in the computer software industry. Skilled in Python, SQL, PHP, Databases, and Linux. Strong engineering professional with a Master of Science (MSc) focused in Computer Science from The University of Manchester.</p>
-
             <ul class="icon-list">
                 <li><i class="zmdi zmdi-phone"></i> 34ny4t 24/7</li>
                 <li><i class="zmdi zmdi-email"></i> badboynonetvoy@chocotravel.me</li>
+                <form action="{{ url_for('start_analyse') }}">
+                    <div style="margin-top: 15px; margin-left: 50%">
+                        <button type="submit" name="action" value="analyse" class="btn btn--light btn--icon-text">
+                            <i class="zmdi zmdi-flip"></i> Analyse
+                        </button>
+                    </div>
+                </form>
             </ul>
         </div>
+        <form>
+            <div>
+               <button type="button" name="action" value="logout" class="btn btn--light btn--icon-text">
+                    <i class="zmdi zmdi-block-alt"></i> LogOut
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+    <!-- Cycle here -->
+    <div class="card__body">
+<div class="form-inline">
+<div class="input-group" style="margin-left: 5%">
+    <h3>Problem: ID/NUMBER</h3>
+</div>
+<div class="input-group" style="margin-left: 50%">
+    <button type="button" name="action" value="logout" class="btn btn--light btn--icon-text">
+        <i class="zmdi zmdi-search"></i> Solved
+    </button>
+</div>
+<div>
+    <table id="data-table-basic" class="display table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th data-column-id="primary_id">ID</th>
+                    <th data-column-id="date">date</th>
+                    <th data-column-id="date_created">date_created</th>
+                    <th data-column-id="order_id">order_id</th>
+                    <th data-column-id="payment_amount">payment_amount</th>
+                    <th data-column-id="payment_type">payment_type</th>
+                    <th data-column-id="payment_reference">payment_reference</th>
+                    <th data-column-id="status">status</th>
+                    <th data-column-id="error_type">error_type</th>
+                    <th data-column-id="difference">difference</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{row['primary_id']}}</td>
+                        <td>{{row['date']}}</td>
+                        <td>{{row['date_created']}}</td>
+                        <td>{{row['order_id']}}</td>
+                        <td>{{row['payment_amount']}}</td>
+                        <td>{{row['payment_type']}}</td>
+                        <td>{{row['payment_reference']}}</td>
+                        <td>{{row['status']}}</td>
+                        <td>{{row['error_type']}}</td>
+                        <td>{{row['difference']}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+</div>
+<div class="form-inline" style="margin-left: 43%">
+    <form>
+        <div class="input-group" style="margin-top: 20px">
+            <div class="form-group">
+                <select class="select2" data-minimum-results-for-search="Infinity">
+                    <option value="chocotravel">ChocoTravel</option>
+                    <option value="chocolife">ChocoLife</option>
+                    <option value="chocofood">ChocoFood</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group" style="margin-top: 3%; margin-left: 2%;">
+            <button type="button" name="action" value="logout" class="btn btn--light btn--icon-text">
+                <i class="zmdi zmdi-search"></i> Appoint
+            </button>
+        </div>
+    </form>
+</div>
+<div class="card__body">
+    <div class="card__header">
+        <div class="media">
+            <div class="media-body">
+                <h2>Felix Harper <small>Posted on 29th Aug 2015 at 02:10</small></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card__body">
+        <p>Aliquam vel sem ut ligula posuere viverra. Ut dolor nisi, fringilla quis consectetur maximus, finibus vel diam. Duis condimentum, diam in semper congue, tortor orci condimentum urna</p>
+    </div>
+
+    <div class="wall-comments">
+        <form class="wall__comments__input">
+            <textarea class="textarea-autosize" placeholder="Write something..."></textarea>
+        </form>
+    </div>
+</div>
+</div>
+    </div>
+<!-- Cycle here -->
+    <!-- Cycle here -->
+    <div class="card__body">
+<div class="form-inline">
+<div class="input-group" style="margin-left: 5%">
+    <h3>Problem: ID/NUMBER</h3>
+</div>
+<div class="input-group" style="margin-left: 50%">
+    <button type="button" name="action" value="logout" class="btn btn--light btn--icon-text">
+        <i class="zmdi zmdi-search"></i> Solved
+    </button>
+</div>
+<div>
+    <table id="data-table-basic" class="table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th data-column-id="primary_id">ID</th>
+                    <th data-column-id="date">date</th>
+                    <th data-column-id="date_created">date_created</th>
+                    <th data-column-id="order_id">order_id</th>
+                    <th data-column-id="payment_amount">payment_amount</th>
+                    <th data-column-id="payment_type">payment_type</th>
+                    <th data-column-id="payment_reference">payment_reference</th>
+                    <th data-column-id="status">status</th>
+                    <th data-column-id="error_type">error_type</th>
+                    <th data-column-id="difference">difference</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{row['primary_id']}}</td>
+                        <td>{{row['date']}}</td>
+                        <td>{{row['date_created']}}</td>
+                        <td>{{row['order_id']}}</td>
+                        <td>{{row['payment_amount']}}</td>
+                        <td>{{row['payment_type']}}</td>
+                        <td>{{row['payment_reference']}}</td>
+                        <td>{{row['status']}}</td>
+                        <td>{{row['error_type']}}</td>
+                        <td>{{row['difference']}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+</div>
+<div class="form-inline" style="margin-left: 43%">
+    <form>
+        <div class="input-group" style="margin-top: 20px">
+            <div class="form-group">
+                <select class="select2" data-minimum-results-for-search="Infinity">
+                    <option value="chocotravel">ChocoTravel</option>
+                    <option value="chocolife">ChocoLife</option>
+                    <option value="chocofood">ChocoFood</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group" style="margin-top: 3%; margin-left: 2%;">
+            <button type="button" name="action" value="logout" class="btn btn--light btn--icon-text">
+                <i class="zmdi zmdi-search"></i> Appoint
+            </button>
+        </div>
+    </form>
+</div>
+<div class="card__body">
+    <div class="card__header">
+        <div class="media">
+            <div class="media-body">
+                <h2>Felix Harper <small>Posted on 29th Aug 2015 at 02:10</small></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card__body">
+        <p>Aliquam vel sem ut ligula posuere viverra. Ut dolor nisi, fringilla quis consectetur maximus, finibus vel diam. Duis condimentum, diam in semper congue, tortor orci condimentum urna</p>
+    </div>
+
+    <div class="wall-comments">
+        <form class="wall__comments__input">
+            <textarea class="textarea-autosize" placeholder="Write something..."></textarea>
+        </form>
+    </div>
+</div>
+</div>
+    </div>
+<!-- Cycle here -->
 
 <!-- Javascript Libraries -->
 
 <!-- jQuery -->
 <script src="{{ url_for('static', filename='vendors/bower_components/jquery/dist/jquery.js')}}"></script>
+<script src="{{ url_for('static', filename='vendors/bower_components/jquery.bootgrid/dist/jquery.bootgrid.js')}}"></script>
+<script src="{{ url_for('static', filename='demo/js/data-table.js')}}"></script>
 
 <!-- Bootstrap -->
 <script src="{{ url_for('static', filename='vendors/bower_components/bootstrap/dist/js/bootstrap.js')}}"></script>
 
+<!-- Select 2 -->
+<script src="{{ url_for('static', filename='vendors/bower_components/select2/dist/js/select2.full.js')}}"></script>
+
+
 <!-- Site Functions & Actions -->
 <script src="{{ url_for('static', filename='js/app.min.js') }}"></script>
-{% endblock %}
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $('select.select2').select2({
+            dropdownAutoWidth: false,
+            width: '250px',
+        });
+    });
+</script>
 </body>
 </html>

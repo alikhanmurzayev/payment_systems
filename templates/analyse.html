@@ -156,38 +156,42 @@
 <div class="card">
     <div class="card__body">
         <div class="table-responsive">
-            <table id="data-table-selection" class="table-striped table-hover">
-                <thead>
-                <tr>
-                    <th data-column-id="primary_id" data-identifier="true">ID</th>
-                    <th data-column-id="date">date</th>
-                    <th data-column-id="order_id">order_id</th>
-                    <th data-column-id="payment_amount">payment_amount</th>
-                    <th data-column-id="payment_type">payment_type</th>
-                    <th data-column-id="payment_reference">payment_reference</th>
-                    <th data-column-id="status">status</th>
-                    <th data-column-id="error_type">error_type</th>
-                    <th data-column-id="difference">difference</th>
-                    <th data-column-id="date_analysed">date_analysed</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for row in rows %}
+            <form method="post" action="{{ url_for('analyse') }}">
+                <table id="data-table-command" class="table-bordered table-hover">
+                    <thead>
                     <tr>
-                        <td>{{row['primary_id']}}</td>
-                        <td>{{row['date']}}</td>
-                        <td>{{row['order_id']}}</td>
-                        <td>{{row['payment_amount']}}</td>
-                        <td>{{row['payment_type']}}</td>
-                        <td>{{row['payment_reference']}}</td>
-                        <td>{{row['status']}}</td>
-                        <td>{{row['error_type']}}</td>
-                        <td>{{row['difference']}}</td>
-                        <td>{{row['date_analysed']}}</td>
+                        <th data-column-id="primary_id">ID</th>
+                        <th data-column-id="date">date</th>
+                        <th data-column-id="order_id">order_id</th>
+                        <th data-column-id="payment_amount">payment_amount</th>
+                        <th data-column-id="payment_type">payment_type</th>
+                        <th data-column-id="payment_reference">payment_reference</th>
+                        <th data-column-id="status">status</th>
+                        <th data-column-id="error_type">error_type</th>
+                        <th data-column-id="difference">difference</th>
+                        <th data-column-id="date_analysed">date_analysed</th>
+                        <th data-column-id="commands">commands</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{row['primary_id']}}</td>
+                            <td>{{row['date']}}</td>
+                            <td>{{row['order_id']}}</td>
+                            <td>{{row['payment_amount']}}</td>
+                            <td>{{row['payment_type']}}</td>
+                            <td>{{row['payment_reference']}}</td>
+                            <td>{{row['status']}}</td>
+                            <td>{{row['error_type']}}</td>
+                            <td>{{row['difference']}}</td>
+                            <td>{{row['date_analysed']}}</td>
+                            <td><script> <button type=\"submit\" class=\"btn btn-default btn-sm\" name='appoint' value="{{row['primary_id']}}"" data-row-id=\"" + row.id + "\">App</button> </script> </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
         </div>
     </div>
 </div>
