@@ -37,7 +37,7 @@
     <div class="tab-content">
         <div class="tab-pane card {{'active' if analyse_active else ''}}" id="analyse">
             <div class="card__body">
-                <form  method="post" action="{{ url_for('submit') }}">
+                <form  method="post" action="{{ url_for('analyse') }}">
                     <div class="form-group">
                         <div class="input-group" style="margin-left: 15%; margin-top: 20px">
                             <span class="input-group-addon">
@@ -91,7 +91,7 @@
                         <div class="btn-group" style="margin-top: 15px; margin-left: 40%; {{'display:none' if hide_navigation else ''}}">
                             <button class="btn btn--light btn--icon-text" name="action" value="back" type="submit" {{'disabled' if back_disable else ''}}><i class="zmdi zmdi-arrow-back"></i>Back</button>
                             <button class="btn btn--light btn--icon-text" name="action" value="export" type="submit"><i class="zmdi zmdi-archive"></i>Export</button>
-                            <button class="btn btn--light btn--icon-text" name="action" value="forward" type="submit" {{'disabled' if forward_disable else ''}}>Forward <i class="zmdi zmdi-arrow-forward"></i></button>
+                            <button class="btn btn--light btn--icon-text" name="action" value="forward" type="submit" {{'disabled' if forward_disable else ''}}>Next <i class="zmdi zmdi-arrow-forward"></i></button>
                             <br><br><br>
                             <p style="margin-left: 30%">
                                 Stage: {{current_stage}} of  {{max_stage}}
@@ -104,11 +104,21 @@
         <div class="tab-pane {{'active' if history_active else ''}}" id="history">
             <div class="card">
                 <div class="card__body">
-                    <form method="post" class="row" action="{{ url_for('submit') }}">
-                        <div class="input-group">
+                    <form method="post" class="row" action="{{ url_for('analyse') }}">
+                        <div class="input-group" style="margin-left: 47.5%;">
+                            <div class="input-group">
+                                <select class="select2" data-minimum-results-for-search="Infinity" name="company_history">
+                                    <option value="chocotravel" {{ 'selected' if 'chocotravel' == request.form.get('company_history') else '' }}>ChocoTravel</option>
+                                    <option value="chocolife" {{ 'selected' if 'chocolife' == request.form.get('company_history') else '' }}>ChocoLife</option>
+                                    <option value="chocofood" {{ 'selected' if 'chocofood' == request.form.get('company_history') else '' }}>ChocoFood</option>
+                                    <option value="rahmet" {{ 'selected' if 'rahmet' == request.form.get('company_history') else '' }}>Rahmet</option>
+                                </select>
+                            </div>
+
+
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="key" value="order_id" required>
+                                    <input type="radio" name="key" value="order_id" required {{ 'checked' if request.form.get('key') == 'order_id' else '' }}>
                                     <i class="input-helper"></i>
                                     Order ID
                                 </label>
@@ -116,24 +126,24 @@
 
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="key" value="payment_reference">
+                                    <input type="radio" name="key" value="payment_reference" {{ 'checked' if request.form.get('key') == 'payment_reference' else '' }}>
                                     <i class="input-helper"></i>
                                     Payment Reference
                                 </label>
                             </div>
 
 
-                            <div class="form-group form-group--float">
+                            <div class="input-group">
                                 <span class="input-group-addon">
                                     <i class="zmdi zmdi-edit"></i>
                                 </span>
-                                <div>
-                                    <input type="text" name="value" class="form-control" required>
+                                <div class="form-group">
+                                    <input type="text" name="value" class="form-control" required value="{{ request.form.get('value') }}">
                                     <i class="form-group__bar"></i>
                                 </div>
                             </div>
                         </div>
-                        <div style="margin-top: 15px; margin-left: 45%">
+                        <div style="margin-top: 15px; margin-left: 50%">
                             <button type="submit" name="action" value="history" class="btn btn--light btn--icon-text"><i class="zmdi zmdi-search"></i> Search history</button>
                         </div>
                     </form>
@@ -151,7 +161,6 @@
                 <tr>
                     <th data-column-id="primary_id" data-identifier="true">ID</th>
                     <th data-column-id="date">date</th>
-                    <th data-column-id="date_created">date_created</th>
                     <th data-column-id="order_id">order_id</th>
                     <th data-column-id="payment_amount">payment_amount</th>
                     <th data-column-id="payment_type">payment_type</th>
@@ -159,6 +168,7 @@
                     <th data-column-id="status">status</th>
                     <th data-column-id="error_type">error_type</th>
                     <th data-column-id="difference">difference</th>
+                    <th data-column-id="date_analysed">date_analysed</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -166,7 +176,6 @@
                     <tr>
                         <td>{{row['primary_id']}}</td>
                         <td>{{row['date']}}</td>
-                        <td>{{row['date_created']}}</td>
                         <td>{{row['order_id']}}</td>
                         <td>{{row['payment_amount']}}</td>
                         <td>{{row['payment_type']}}</td>
@@ -174,6 +183,7 @@
                         <td>{{row['status']}}</td>
                         <td>{{row['error_type']}}</td>
                         <td>{{row['difference']}}</td>
+                        <td>{{row['date_analysed']}}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -203,7 +213,7 @@
     $(document).ready(function() {
         $('select.select2').select2({
             dropdownAutoWidth: false,
-            width: '500px',
+            width: '250px',
         });});
 </script>
 </body>

@@ -8,6 +8,7 @@ messages_table = 'messages'
 payment_trans_table = 'payment_trans'
 choco_table = 'choco'
 log_table = 'log'
+working_table = 'working'
 users_table = 'users'
 daily_tables_table = 'daily_tables'
 
@@ -17,6 +18,8 @@ status_refund = '2'
 attachment_dir = 'Attachments'
 
 reports_dir = 'Reports'
+
+json_dir = 'ApiResponses'
 
 
 # payment systems' emails and keys

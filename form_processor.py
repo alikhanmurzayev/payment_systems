@@ -5,6 +5,7 @@ import itertools
 
 import database
 import read_json
+import config
 
 
 def get_date_interval(date_from, date_to):
@@ -16,10 +17,10 @@ def get_date_interval(date_from, date_to):
         date_temp += datetime.timedelta(1)
     return date_interval
 def get_daily_table_name(day, company):
-    day = company + '_' + str(day).replace('-', '_')
+    day = str(company) + '_' + str(day).replace('-', '_')
     return 'daily_' + day
 def get_api_response(day, company):
-    json_file_name = get_daily_table_name(day, company) + '.json'
+    json_file_name = config.json_dir + '/' + get_daily_table_name(day, company) + '.json'
     with open(json_file_name) as f:
         return json.load(f)
 def get_report_table_name(user_ip, company):
@@ -88,8 +89,9 @@ def make_daily_analysis(date_interval, company):
         errors = combine_errors(first_error_table, second_error_table, third_error_table)
         daily_table_name = get_daily_table_name(d, company)
         database.create_daily_analysis_table(daily_table_name)
-        database.update_daily_tables_table(d)
-        database.update_daily_analysis_table(daily_table_name, errors)
+        database.update_daily_tables_table(d, company)
+        date_analysed = datetime.datetime.now()
+        database.update_daily_analysis_table(daily_table_name, errors, date_analysed)
         # магия оканчивается
         # clearing database from temporary tables
         database.drop_table(payment_temp_table)

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% extends 'layout.html' %}
+{% block body %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>PROFILE</title>
+
+        <!-- Vendors -->
+
+        <!-- Animate CSS -->
+        <link href="{{ url_for('static', filename='vendors/bower_components/animate.css/animate.css') }}" rel="stylesheet">
+
+        <!-- Material Design Icons -->
+        <link href="{{ url_for('static', filename='vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css') }}" rel="stylesheet">
+
+        <!-- Malihu Scrollbar -->
+        <link href="{{ url_for('static', filename='vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') }}" rel="stylesheet">
+
+        <!-- Light Gallery -->
+        <link href="{{ url_for('static', filename='vendors/bower_components/lightgallery/dist/css/lightgallery.css') }}" rel="stylesheet">
+
+        <!-- Site CSS -->
+        <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+
+        <!-- Page loader -->
+        <script src="{{ url_for('static', filename='js/page-loader.js') }}"></script>
+    </head>
+<body>
+
+<div class="content--boxed-sm">
+    <div class="card profile">
+        <header class="profile__img">
+            <h2>{{ session['login'] }} <small>Head of IT department</small></h2>
+        </header>
+        <div class="profile__img">
+            <img src="https://pp.userapi.com/WKojaSO5bGz5RaUQEfxNsz-rroWSuqAaskJK_Q/vxJQ-CX7Cfs.jpg" alt="">
+        </div>
+        <div class="profile__info">
+            <p>Experienced Lead Software Engineer with a demonstrated history of working in the computer software industry. Skilled in Python, SQL, PHP, Databases, and Linux. Strong engineering professional with a Master of Science (MSc) focused in Computer Science from The University of Manchester.</p>
+
+            <ul class="icon-list">
+                <li><i class="zmdi zmdi-phone"></i> 34ny4t 24/7</li>
+                <li><i class="zmdi zmdi-email"></i> badboynonetvoy@chocotravel.me</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Javascript Libraries -->
+
+<!-- jQuery -->
+<script src="{{ url_for('static', filename='vendors/bower_components/jquery/dist/jquery.js')}}"></script>
+
+<!-- Bootstrap -->
+<script src="{{ url_for('static', filename='vendors/bower_components/bootstrap/dist/js/bootstrap.js')}}"></script>
+
+<!-- Site Functions & Actions -->
+<script src="{{ url_for('static', filename='js/app.min.js') }}"></script>
+{% endblock %}
+</body>
+</html>

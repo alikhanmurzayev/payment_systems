@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Site CSS -->
+<link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+<div class="form-group">
+  <div class="input-group">
+  {% if not session.logged_in %}
+  {% else %}
+    <a href="{{ url_for('logout') }}">log out</a>
+  {% endif %}
+  </div>
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}
+  {% endblock %}
+</div>
+</body>
+</html>
