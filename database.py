@@ -2,8 +2,22 @@ import sqlite3
 import pandas
 import os
 import datetime
+import itertools
 
 import config
+
+
+
+if not os.path.exists(config.attachment_dir):
+    os.makedirs(config.attachment_dir)
+
+if not os.path.exists(config.reports_dir):
+    os.makedirs(config.reports_dir)
+
+if not os.path.exists(config.json_dir):
+    os.makedirs(config.json_dir)
+
+
 
 def open_connection(database_name):
     conn = sqlite3.connect(database_name)
@@ -30,7 +44,7 @@ def create_companies_table():
     try:
         query = f"CREATE TABLE {config.companies_table} " \
                 f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, company varchar, " \
-                f"email varhcar, password varchar)"
+                f"email varchar, password varchar)"
         cursor.execute(query)
     except:
         pass
@@ -467,9 +481,9 @@ def export_to_excel(table_name):
     file_name = table_name + '.xlsx'
     file_path = config.reports_dir + '/' + file_name
     writer = pandas.ExcelWriter(file_path, engine='xlsxwriter')
-    df1.to_excel(writer, sheet_name='Ошибка №1')
-    df2.to_excel(writer, sheet_name='Ошибка №2')
-    df3.to_excel(writer, sheet_name='Ошибка №3')
+    df1.to_excel(writer, sheet_name='Упущения компании')
+    df2.to_excel(writer, sheet_name='Упущения ПС')
+    df3.to_excel(writer, sheet_name='Различная сумма')
     writer.save()
     close_connection(conn, cursor)
     return file_name
@@ -572,6 +586,12 @@ def get_user(login):
     phone = result[8]
     photo = result[9]
     return login, password, role, name, surname, description, email, phone, photo
+def get_executors():
+    conn, cursor = open_connection(config.database_name)
+    query = f"SELECT login FROM {config.users_table} WHERE role='executor'"
+    result = cursor.execute(query).fetchall()
+    close_connection(conn, cursor)
+    return result
 
 
 def create_daily_tables_table():
@@ -598,6 +618,77 @@ def get_daily_tables():
     result = cursor.execute(query).fetchall()
     return result
 
+def create_problems_table():
+    conn, cursor = open_connection(config.database_name)
+    try:
+        query = f"CREATE TABLE {config.problems_table} " \
+                f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, order_id varchar, " \
+                f"appointee varchar, executor varchar, date_appointed date, status varchar)"
+        cursor.execute(query)
+    except:
+        pass
+    close_connection(conn, cursor)
+def update_problems_table(order_id, appointee, executor, status):
+    conn, cursor = open_connection(config.database_name)
+    date_appointed = datetime.datetime.now()
+    check_existence = f"SELECT executor, status FROM {config.problems_table} WHERE order_id='{order_id}'"
+    result = cursor.execute(check_existence).fetchall()
+    if len(result) == 0:
+        query = f"INSERT INTO {config.problems_table} (order_id, appointee, executor, date_appointed, status) " \
+                f"VALUES ('{order_id}', '{appointee}', '{executor}', '{date_appointed}', '{status}')"
+    else:
+        old_executor = result[0][0]
+        old_status = result[0][1]
+        if str(executor) != str(old_executor) or str(status) != str(old_status):
+            query = f"UPDATE {config.problems_table} SET executor='{executor}', status='{status}', " \
+                    f"date_appointed='{date_appointed}' WHERE order_id='{order_id}'"
+        else:
+            close_connection(conn, cursor)
+            return
+    cursor.execute(query)
+    close_connection(conn, cursor)
+def get_problems(login='', role=''):
+    conn, cursor = open_connection(config.database_name)
+    if login and role:
+        query = f"SELECT id FROM {config.problems_table} WHERE {role}='{login}'"
+    else:
+        query = f"SELECT order_id FROM {config.problems_table}"
+    result = cursor.execute(query).fetchall()
+    close_connection(conn, cursor)
+    return list(itertools.chain.from_iterable(result))
+def set_executor(id, executor):
+    conn, cursor = open_connection(config.database_name)
+    date_appointed = datetime.datetime.now()
+    query = f"UPDATE {config.problems_table} SET executor='{executor}', " \
+            f"date_appointed='{date_appointed}' WHERE id='{id}'"
+    cursor.execute(query)
+    close_connection(conn, cursor)
+
+def create_comments_table():
+    conn, cursor = open_connection(config.database_name)
+    try:
+        query = f"CREATE TABLE {config.comments_table} " \
+                f"(id integer PRIMARY KEY AUTOINCREMENT NOT NULL, problem_id varchar, " \
+                f"date date, author_login varchar, text varchar)"
+        cursor.execute(query)
+    except:
+        pass
+    close_connection(conn, cursor)
+
+def write_comment(problem_id, author_login, text):
+    conn, cursor = open_connection(config.database_name)
+    date = datetime.datetime.now()
+    query = f"INSERT INTO {config.comments_table} (problem_id, date, author_login, text)" \
+            f"VALUES ('{problem_id}', '{date}', '{author_login}', '{text}')"
+    cursor.execute(query)
+    close_connection(conn, cursor)
+def get_comments(problem_id):
+    conn, cursor = open_connection(config.database_name)
+    query = f"SELECT * FROM {config.comments_table} WHERE problem_id='{problem_id}'"
+    result = cursor.execute(query).fetchall()
+    close_connection(conn, cursor)
+    return result
+
 create_messages_table()
 create_payment_trans_table()
 create_log_table()
@@ -612,12 +703,18 @@ create_users_table()
 add_user('1', '1', 'appointee', 'Kanat', 'Akbayev', 'Some description', 'badbounonetvoy@chocolife.me', '87451254478', 'https://instagram.fhel5-1.fna.fbcdn.net/vp/6aa88d72b768fa7230146dc1b5a75f02/5C0D158A/t51.2885-15/e15/11380745_386663584857955_288199800_n.jpg')
 add_user('2', '2', 'executor', 'Alexey', 'Navalny', 'Future president of Russian Federation...', 'badbounonetvoy2@chocolife.me', '87451254468', 'http://geohistory.today/wp-content/uploads/2017/10/opening-777x437.jpg')
 
+################################
+create_problems_table()
 
-if not os.path.exists(config.attachment_dir):
-    os.makedirs(config.attachment_dir)
+create_comments_table()
 
-if not os.path.exists(config.reports_dir):
-    os.makedirs(config.reports_dir)
 
-if not os.path.exists(config.json_dir):
-    os.makedirs(config.json_dir)
+update_problems_table('1', '1', '2', '0')
+update_problems_table('2', '1', '2', '0')
+update_problems_table('3', '1', '2', '0')
+update_problems_table('4', '1', '2', '0')
+
+
+
+
+

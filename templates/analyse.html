@@ -165,7 +165,6 @@
                 <table id="data-table-command" class="table-bordered table-hover">
                     <thead>
                     <tr>
-                        <th data-column-id="primary_id">ID</th>
                         <th data-column-id="date">date</th>
                         <th data-column-id="order_id">order_id</th>
                         <th data-column-id="payment_amount">payment_amount</th>
@@ -181,17 +180,16 @@
                     <tbody>
                     {% for row in rows %}
                         <tr>
-                            <td>{{row['primary_id']}}</td>
                             <td>{{row['date']}}</td>
                             <td>{{row['order_id']}}</td>
                             <td>{{row['payment_amount']}}</td>
                             <td>{{row['payment_type']}}</td>
                             <td>{{row['payment_reference']}}</td>
                             <td>{{row['status']}}</td>
-                            <td>{{row['error_type']}}</td>
+                            <td>{{'Упущение компании' if row['error_type'] == 1 else ''}}{{'Упущение ПС' if row['error_type'] == 2 else ''}}{{'Различная сумма' if row['error_type'] == 3 else ''}}</td>
                             <td>{{row['difference']}}</td>
                             <td>{{row['date_analysed']}}</td>
-                            <td><script> <button type=\"submit\" class=\"btn btn-default btn-sm\" name='appoint' value="{{row['primary_id']}}"" data-row-id=\"" + row.id + "\">App</button> </script> </td>
+                            <td><script> <button {{'disabled' if row['order_id'] in problems else ''}} type=\"submit\" class=\"btn btn-default btn-sm\" name='appoint' value="{{row['order_id']}}"" data-row-id=\"" + row.id + "\">appoint</button> </script> </td>
                         </tr>
                     {% endfor %}
                     </tbody>

@@ -248,3 +248,6 @@ def get_history(key, value, company):
     rows = database.get_report_table_rows(history_table_name)
     return rows
 
+
+
+

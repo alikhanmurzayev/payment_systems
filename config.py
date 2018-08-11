@@ -11,6 +11,8 @@ log_table = 'log'
 working_table = 'working'
 users_table = 'users'
 daily_tables_table = 'daily_tables'
+problems_table = 'problems'
+comments_table = 'comments'
 
 status_payment = '1'
 status_refund = '2'
