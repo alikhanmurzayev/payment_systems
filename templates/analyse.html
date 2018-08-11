@@ -189,7 +189,13 @@
                             <td>{{'Упущение компании' if row['error_type'] == 1 else ''}}{{'Упущение ПС' if row['error_type'] == 2 else ''}}{{'Различная сумма' if row['error_type'] == 3 else ''}}</td>
                             <td>{{row['difference']}}</td>
                             <td>{{row['date_analysed']}}</td>
-                            <td><script> <button {{'disabled' if row['order_id'] in problems else ''}} type=\"submit\" class=\"btn btn-default btn-sm\" name='appoint' value="{{row['order_id']}}"" data-row-id=\"" + row.id + "\">appoint</button> </script> </td>
+                            <td>
+                                <script>
+                                    <button {{'disabled' if row['order_id'] in problems else ''}} type="submit" class="{{'btn btn-warning' if row['order_id'] in problems else 'btn btn-success'}}" name="appoint" value="{{row['order_id']}}">
+                                        Appoint
+                                    </button>
+                                </script>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>

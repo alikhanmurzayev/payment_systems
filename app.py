@@ -43,18 +43,21 @@ def profile():
         login, password, role, name, surname, description, email, phone, photo = database.get_user(session['login'])
         problem_list = database.get_problems(login=login, role=role)
 
-        if action == 'appoint_':
+        if action == 'appoint':
             executor = request.form.get('executor')
-            database.set_executor()
+            id = request.form.get('problem_id')
+            print(id, executor)
+            database.set_executor(id, executor)
         executors = database.get_executors()
         return render_template('profile.html', name=name, surname=surname, role=role, description=description,
                                email=email,
                                phone=phone, photo=photo, executors=executors, problems=problem_list)
+    executor = request.form.get('executor')
     login, password, role, name, surname, description, email, phone, photo = database.get_user(session['login'])
     problem_list = database.get_problems(login=login, role=role)
     return render_template('profile.html', name=name, surname=surname, role=role, description=description,
                            email=email,
-                           phone=phone, photo=photo, problems=problem_list)
+                           phone=phone, photo=photo, problems=problem_list, executors=executors)
 
 @app.route('/start_analyse')
 def start_analyse():
