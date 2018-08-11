@@ -706,9 +706,9 @@ update_companies_table('chocotravel', 'chococasetest@gmail.com', 'kanatakbayev')
 update_companies_table('chocolife', 'salambayev.choco@gmail.com', 'S31Amchina')
 ################################
 create_users_table()
-add_user('kanat', 'kanat', 'appointee', 'Kanat', 'Akbayev', 'Some description', 'badbounonetvoy@chocolife.me', '87451254478', 'https://instagram.fhel5-1.fna.fbcdn.net/vp/6aa88d72b768fa7230146dc1b5a75f02/5C0D158A/t51.2885-15/e15/11380745_386663584857955_288199800_n.jpg')
-add_user('renat', 'renat', 'executor', 'Renat', '', 'Future president of Russian Federation...', 'badbounonetvoy2@chocolife.me', '87451254468', 'http://filmoserial.ru/wp-content/uploads/2015/08/Kto-ya-2015.jpg')
-add_user('denis', 'denis', 'executor', 'Denis', '', 'Future president of Russian Federation...', 'badbounonetvoy2@chocolife.me', '87451254468', 'http://filmoserial.ru/wp-content/uploads/2015/08/Kto-ya-2015.jpg')
+add_user('kanat', 'kanat', 'appointee', 'Kanat', 'Akbayev', 'Some description', 'kanat@chocolife.me', '87451254478', 'https://instagram.fhel5-1.fna.fbcdn.net/vp/6aa88d72b768fa7230146dc1b5a75f02/5C0D158A/t51.2885-15/e15/11380745_386663584857955_288199800_n.jpg')
+add_user('ruslan', 'ruslan', 'executor', 'Ruslan', '', 'Web-developer in ChocoFamily', 'ruslan@chocolife.me', '87451254468', 'http://filmoserial.ru/wp-content/uploads/2015/08/Kto-ya-2015.jpg')
+add_user('denis', 'denis', 'executor', 'Denis', '', 'BackEnd developen in ChocoFamily', 'denis@chocolife.me', '87451254468', 'http://filmoserial.ru/wp-content/uploads/2015/08/Kto-ya-2015.jpg')
 
 ################################
 create_problems_table()

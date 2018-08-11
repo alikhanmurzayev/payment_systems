@@ -42,7 +42,6 @@ def profile():
         action = request.form.get('action')
         login, password, role, name, surname, description, email, phone, photo = database.get_user(session['login'])
         problem_list = database.get_problems(login=login, role=role)
-
         if action == 'appoint':
             executor = request.form.get('executor')
             id = request.form.get('problem_id')
@@ -52,7 +51,7 @@ def profile():
         return render_template('profile.html', name=name, surname=surname, role=role, description=description,
                                email=email,
                                phone=phone, photo=photo, executors=executors, problems=problem_list)
-    executor = request.form.get('executor')
+    executors = database.get_executors()
     login, password, role, name, surname, description, email, phone, photo = database.get_user(session['login'])
     problem_list = database.get_problems(login=login, role=role)
     return render_template('profile.html', name=name, surname=surname, role=role, description=description,
